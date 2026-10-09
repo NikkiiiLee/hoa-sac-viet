@@ -5,7 +5,7 @@ import kyYeuImg from '../assets/images/concept_ky_yeu_1790948951049.jpg';
 import duXuanImg from '../assets/images/concept_du_xuan_1790948981273.jpg';
 import heroImg from '../assets/images/hero_hoasacviet_remix_1790948938640.jpg';
 
-import aoChenRealImg from '../assets/images/ao-chen-that.jpg';
+import aoChenRealImg from '../assets/images/ao-chen-that.png';
 
 export interface TuThanPart {
   number: number;
