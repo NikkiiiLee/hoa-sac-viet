@@ -1,0 +1,2430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Họa Sắc Việt – Nét Cổ Truyền, Dáng Thời Nay</title>
+  <meta name="description" content="Trợ lý AI Stylist tiên phong giúp thế hệ trẻ khám phá, tự tay remix cổ phục và gìn giữ trọn vẹn hồn cốt dân tộc trong từng nhịp thở đương đại.">
+  
+  <!-- React 18 & Babel CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Tailwind CSS 3 CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons & html2canvas CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Google Fonts Chuẩn Việt Hóa (Playfair Display + Be Vietnam Pro) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Be Vietnam Pro"', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif']
+          },
+          colors: {
+            heritage: {
+              red: '#B83227',
+              gold: '#D4AF37',
+              blue: '#1B3B6F',
+              paper: '#FAF7F2',
+              dark: '#2C241D'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * {
+      word-spacing: normal !important;
+      letter-spacing: normal !important;
+    }
+    body, button, input, select, textarea, span, p, h1, h2, h3, h4, h5, h6 {
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    }
+    body {
+      background-color: #FAF7F2;
+      color: #2C241D;
+    }
+    .font-serif {
+      font-family: 'Playfair Display', Georgia, serif !important;
+    }
+    .font-display {
+      font-family: 'Playfair Display', Georgia, serif !important;
+      line-height: 1.35 !important;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+  </style>
+</head>
+<body class="bg-[#FAF7F2] text-[#2C241D] antialiased selection:bg-[#B83227]/20 selection:text-[#B83227]">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // --- DATA DEFINITIONS ---
+    const GARMENTS = {
+      ao_chen: {
+        id: 'ao_chen',
+        name: 'Áo Ngũ Thân Tay Chẽn',
+        eraName: 'Triều Nguyễn (TK 19 - 20)',
+        category: 'Thường phục Nho nhã',
+        desc: 'Tay áo cắt ôm gọn sát cổ tay, 5 cúc Ngũ Thường nghiêm cẩn, tiện cho đời sống phố thị và hoạt động thường nhật.',
+        defaultLapel: 'huu_nham'
+      },
+      ao_tac: {
+        id: 'ao_tac',
+        name: 'Áo Ngũ Thân Tay Thụng (Áo Tấc)',
+        eraName: 'Đại Lễ Phục Triều Nguyễn',
+        category: 'Đại lễ phục Hoàng triều',
+        desc: 'Tay thụng buông dài 30–40 cm quá ngón tay, biểu trưng cho cốt cách ung dung, uy nghi khi hành đại lễ.',
+        defaultLapel: 'huu_nham'
+      },
+      ao_giao_linh: {
+        id: 'ao_giao_linh',
+        name: 'Áo Giao Lĩnh Cổ Chéo',
+        eraName: 'Đại Việt (Lý - Trần - Lê)',
+        category: 'Cổ phong Đại Việt',
+        desc: 'Hai vạt đan chéo chữ V, thắt đại đái lụa ngang eo, phong thái tao nhã của sĩ phu ngàn năm văn hiến.',
+        defaultLapel: 'huu_nham'
+      },
+      ao_tu_than: {
+        id: 'ao_tu_than',
+        name: 'Áo Tứ Thân & Yếm Đào',
+        eraName: 'Dân gian Đồng bằng Bắc Bộ',
+        category: 'Dân gian Kinh Bắc',
+        desc: 'Bốn vạt thướt tha, thắt dải lụa mềm mại, yếm thắm kín đáo, biểu tượng của nét duyên thầm phụ nữ Bắc Bộ.',
+        defaultLapel: 'huu_nham'
+      },
+      ao_dai_truyen_thong: {
+        id: 'ao_dai_truyen_thong',
+        name: 'Áo Dài Truyền Thống',
+        eraName: 'Đô Thị Tân Thời - Nay',
+        category: 'Quốc phục Việt Nam',
+        desc: 'Hai tà buông tha thướt trên nền quần lụa trắng suông mềm, đường xẻ hông thanh nhã tôn vinh nét đoan trang.',
+        defaultLapel: 'huu_nham'
+      }
+    };
+
+    const COLORS = [
+      { id: 'do_chu_sa', name: 'Đỏ Chu Sa', hex: '#B83227', element: 'Hỏa' },
+      { id: 'xanh_cham', name: 'Xanh Chàm Đại Việt', hex: '#1B3B6F', element: 'Thủy' },
+      { id: 'vang_hoang_yen', name: 'Vàng Hoàng Yến', hex: '#D4AF37', element: 'Thổ' },
+      { id: 'trang_nga', name: 'Trắng Ngà / Bạch Tuyết', hex: '#F7F4EE', element: 'Kim' },
+      { id: 'hong_tham', name: 'Hồng Thắm Yếm Đào', hex: '#D9536F', element: 'Hỏa' },
+      { id: 'den_huyen', name: 'Đen Thâm Mực Nho', hex: '#1E1E22', element: 'Thủy' },
+      { id: 'xanh_thien_thanh', name: 'Xanh Thiên Thanh', hex: '#3B82F6', element: 'Thủy' }
+    ];
+
+    function calculateAuthenticity(outfit) {
+      let score = 100;
+      let penalties = [];
+
+      if (outfit.lapelDirection === 'ta_nham') {
+        score -= 50;
+        penalties.push('Cài vạt Tả nhậm (trái đè phải) là đại nghịch, quy chế dành cho tang lễ.');
+      }
+      if (outfit.bottom === 'quan_short_rach') {
+        score -= 30;
+        penalties.push('Đáy quần short rách lộ đùi qua tà xẻ, gây phản cảm mỹ cảm dân tộc.');
+      }
+      if (outfit.garmentId === 'ao_tac' && outfit.isSleeveRolled) {
+        score -= 20;
+        penalties.push('Xắn tay thụng Áo Tấc làm gãy nếp đại lễ nghiêm trang.');
+      }
+      if (outfit.headwear === 'tram_thanh_trieu') {
+        score -= 20;
+        penalties.push('Trâm cài Thanh triều là phụ kiện ngoại lai, không thuộc cổ phục Việt.');
+      }
+      if (outfit.outerwear === 'dai_obi') {
+        score -= 25;
+        penalties.push('Đai Obi to bản của Kimono Nhật Bản gây lai căng bản sắc.');
+      }
+      if (outfit.isSoloYem) {
+        score -= 40;
+        penalties.push('Mặc độc chiếc yếm lót ra nơi công cộng làm mất đi vẻ đoan trang.');
+      }
+
+      score = Math.max(0, score);
+      return { score, penalties, isPerfect: score === 100 };
+    }
+
+    function calculateWuXingHarmony(mainColor, innerColor) {
+      const sinhMap = {
+        'Mộc': 'Hỏa',
+        'Hỏa': 'Thổ',
+        'Thổ': 'Kim',
+        'Kim': 'Thủy',
+        'Thủy': 'Mộc'
+      };
+      const khacMap = {
+        'Thủy': 'Hỏa',
+        'Hỏa': 'Kim',
+        'Kim': 'Mộc',
+        'Mộc': 'Thổ',
+        'Thổ': 'Thủy'
+      };
+      const isSinh = sinhMap[mainColor.element] === innerColor.element || sinhMap[innerColor.element] === mainColor.element;
+      const isKhac = khacMap[mainColor.element] === innerColor.element || khacMap[innerColor.element] === mainColor.element;
+      if (isSinh) {
+        return { score: 98, isSinh: true, isKhac: false, label: 'Tuyệt Phẩm Hài Hòa', phrase: `${innerColor.element} sinh ${mainColor.element}` };
+      }
+      if (isKhac) {
+        return { score: 52, isSinh: false, isKhac: true, label: 'Cần Tinh Chỉnh', phrase: `${mainColor.element} khắc ${innerColor.element}` };
+      }
+      return { score: 88, isSinh: false, isKhac: false, label: 'Nhã Nhặn & Cân Bằng', phrase: 'Đồng điệu tương hòa' };
+    }
+
+    // --- MAIN APP COMPONENT ---
+    function App() {
+      const [activeTab, setActiveTab] = useState('home'); // Default: 'home'
+      const [currentUser, setCurrentUser] = useState(null); // null = Guest Mode, object = Member Mode
+      const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+      const [isAuthLoading, setIsAuthLoading] = useState(false);
+      const [authTab, setAuthTab] = useState('login');
+      const [authNotice, setAuthNotice] = useState(null);
+      const [registeredUsers, setRegisteredUsers] = useState([
+        { name: 'Minh An (UEH)', email: 'minhan.ueh@gmail.com', password: '••••••••' }
+      ]);
+      const [loginEmail, setLoginEmail] = useState('minhan.ueh@gmail.com');
+      const [loginPassword, setLoginPassword] = useState('••••••••');
+      const [regName, setRegName] = useState('');
+      const [regEmail, setRegEmail] = useState('');
+      const [regPassword, setRegPassword] = useState('');
+      const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+      const [savedLookbook, setSavedLookbook] = useState([
+        { id: 'saved-1', title: 'Kỷ Yếu Dinh Độc Lập (Áo Tấc x Sneaker Retro)', garmentId: 'ao_tac', occasion: 'tot_nghiep', mainColor: COLORS[0], innerColor: COLORS[3], bottomColor: COLORS[3], gender: 'female', height: 165, weight: 52, isFavorite: true, createdAt: Date.now() - 3600000 * 2, date: 'Hôm nay' },
+        { id: 'saved-2', title: 'Phố Thị Trí Thức (Áo Chẽn x Blazer)', garmentId: 'ao_chen', occasion: 'dao_pho', mainColor: COLORS[1], innerColor: COLORS[3], bottomColor: COLORS[3], gender: 'female', height: 165, weight: 52, isFavorite: true, createdAt: Date.now() - 3600000 * 28, date: 'Tuần này' }
+      ]);
+      const [isLookbookOpen, setIsLookbookOpen] = useState(false);
+      const [lookbookTab, setLookbookTab] = useState('hub');
+      const [timelineFilter, setTimelineFilter] = useState('all');
+      const [garmentFilter, setGarmentFilter] = useState('all');
+      const [occasionFilter, setOccasionFilter] = useState('all');
+      const [onlyFavorites, setOnlyFavorites] = useState(false);
+      const [isAlbumCreatorOpen, setIsAlbumCreatorOpen] = useState(false);
+      const [selectedAlbumIds, setSelectedAlbumIds] = useState(['saved-1', 'saved-2']);
+      const [albumName, setAlbumName] = useState('Bộ Sưu Tập Kỷ Yếu Dinh Độc Lập - Nhóm UEH 2026');
+      const [generatedAlbumLink, setGeneratedAlbumLink] = useState(null);
+      const [albumToast, setAlbumToast] = useState(null);
+      const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+      const [feedbackTopic, setFeedbackTopic] = useState('chuan_muc_co_phuc');
+      const [feedbackMessage, setFeedbackMessage] = useState('');
+      const [feedbackError, setFeedbackError] = useState(null);
+      const [feedbackShake, setFeedbackShake] = useState(false);
+      const [isFeedbackSubmitting, setIsFeedbackSubmitting] = useState(false);
+      const [feedbackToast, setFeedbackToast] = useState(null);
+      const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
+      const [tourStep, setTourStep] = useState(null);
+      const [shakeKey, setShakeKey] = useState(0);
+      const [isExporting, setIsExporting] = useState(false);
+
+      useEffect(() => {
+        if (activeTab === 'studio') {
+          try {
+            const hasSeen = localStorage.getItem('has_seen_studio_tour');
+            if (!hasSeen) {
+              localStorage.setItem('has_seen_studio_tour', 'true');
+              setTourStep(1);
+            }
+          } catch (e) {}
+        } else {
+          setTourStep(null);
+        }
+      }, [activeTab]);
+      const [showHotspots, setShowHotspots] = useState(true);
+      const [activeHotspotId, setActiveHotspotId] = useState(null);
+      const [hoveredHotspotId, setHoveredHotspotId] = useState(null);
+
+      const [isBodyOpen, setIsBodyOpen] = useState(false);
+      const [outfit, setOutfit] = useState({
+        gender: 'female',
+        garmentId: 'ao_tac',
+        mainColor: COLORS[0],
+        innerColor: COLORS[3],
+        bottomColor: COLORS[3],
+        lapelDirection: 'huu_nham',
+        isSleeveRolled: false,
+        isSoloYem: false,
+        bottom: 'quan_lua',
+        headwear: 'khan_dong',
+        outerwear: 'none',
+        height: 165,
+        weight: 52
+      });
+
+      const authenticity = calculateAuthenticity(outfit);
+      const harmony = calculateWuXingHarmony(outfit.mainColor, outfit.innerColor || COLORS[3]);
+
+      const handleAiAutoFixColor = () => {
+        const mainElem = outfit.mainColor.element;
+        const genMap = {
+          'Thủy': 'Kim',
+          'Mộc': 'Thủy',
+          'Hỏa': 'Mộc',
+          'Thổ': 'Hỏa',
+          'Kim': 'Thổ'
+        };
+        const target = genMap[mainElem] || 'Kim';
+        const ideal = COLORS.find(c => c.element === target) || COLORS[3];
+        setOutfit(prev => ({
+          ...prev,
+          innerColor: ideal,
+          bottom: prev.bottom === 'quan_short_rach' ? 'quan_lua' : prev.bottom
+        }));
+        setFeedbackToast(`✨ AI Gemini đã cân bằng ngũ hành: ${ideal.element} sinh ${mainElem} – Sinh khí & Rạng rỡ trường tồn!`);
+        setTimeout(() => setFeedbackToast(null), 3500);
+      };
+
+      const hotspots = [
+        { id: 'collar', label: 'Cổ Áo', coords: { x: 150, y: 110 }, title: 'Cổ Lập Lĩnh / Giao Lĩnh', content: 'Cổ áo dựng tròn khít hoặc vạt chéo chữ V, biểu trưng cho sự ngay thẳng và khiêm cung.' },
+        { id: 'buttons', label: 'Hàng Cúc', coords: outfit.lapelDirection === 'ta_nham' ? { x: 134, y: 145 } : { x: 168, y: 145 }, title: '5 Khuy Ngũ Thường', content: '5 hạt khuy biểu thị 5 đức tính: Nhân – Lễ – Nghĩa – Trí – Tín của người quân tử.' },
+        { id: 'lapel', label: 'Mép Vạt', coords: outfit.lapelDirection === 'ta_nham' ? { x: 124, y: 175 } : { x: 176, y: 175 }, title: 'Quy Chuẩn Hữu Nhậm', content: 'Vạt phải luôn đè vạt trái theo đạo Dương của người sống. Cài Tả nhậm là cấm kỵ tang ma.' },
+        { id: 'sleeves', label: 'Ống Tay', coords: { x: 80, y: 220 }, title: 'Ống Tay Áo', content: 'Tay chẽn năng động thường nhật, tay thụng 30-40cm ung dung khi hành đại lễ hoàng triều.' },
+        { id: 'body', label: 'Thân Áo', coords: { x: 150, y: 260 }, title: 'Kết Cấu Ngũ Thân', content: 'Bốn thân ngoài tượng trưng tứ thân phụ mẫu; thân thứ năm chở che người mặc, biểu thị đạo Hiếu.' }
+      ];
+      const activeHotspot = hotspots.find(h => h.id === (hoveredHotspotId || activeHotspotId));
+
+      const handleRestoreCompliant = () => {
+        setOutfit(prev => ({
+          ...prev,
+          lapelDirection: 'huu_nham',
+          isSleeveRolled: false,
+          isSoloYem: false,
+          bottom: 'quan_lua',
+          headwear: 'khan_dong',
+          outerwear: 'none'
+        }));
+        setShakeKey(prev => prev + 1);
+      };
+
+      const triggerChallenge = (updates) => {
+        setOutfit(prev => ({ ...prev, ...updates }));
+        setShakeKey(prev => prev + 1);
+      };
+
+      // 1-Click Launch Presets from Landing
+      const handleLaunchConcept = (updates) => {
+        setOutfit(prev => ({ ...prev, ...updates }));
+        setActiveTab('studio');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      // Xuất ảnh Lookbook 9:16 chuẩn nét 2x với html2canvas - Tải file ảnh thật xuống máy tính
+      const handleExportPNG = async () => {
+        const element = document.getElementById('lookbook-story-card');
+        if (!element) {
+          console.error('Không tìm thấy khung thẻ id="lookbook-story-card"');
+          return;
+        }
+        setIsExporting(true);
+        try {
+          if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+          }
+          await new Promise(r => setTimeout(r, 80));
+          const sanitizeOklab = (clonedDoc) => {
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            const toStdColor = (val) => {
+              if (!val) return '';
+              const str = val.trim();
+              if (!str || str === 'transparent' || str === 'inherit' || str === 'none') return str;
+              if (!str.includes('oklab') && !str.includes('oklch')) return str;
+              if (tempCtx) {
+                try {
+                  tempCtx.fillStyle = 'rgba(1, 2, 3, 0.5)';
+                  tempCtx.fillStyle = str;
+                  if (tempCtx.fillStyle !== 'rgba(1, 2, 3, 0.5)') return tempCtx.fillStyle;
+                } catch(e) {}
+              }
+              return '#2C241D';
+            };
+            try {
+              clonedDoc.querySelectorAll('style').forEach(s => {
+                if (s.textContent && (s.textContent.includes('oklab') || s.textContent.includes('oklch'))) {
+                  s.textContent = s.textContent
+                    .replace(/oklab\([^)]+\)/gi, m => toStdColor(m))
+                    .replace(/oklch\([^)]+\)/gi, m => toStdColor(m));
+                }
+              });
+            } catch(e) {}
+            try {
+              const rootEl = clonedDoc.getElementById('lookbook-story-card') || clonedDoc.body;
+              rootEl.querySelectorAll('*').forEach(el => {
+                try {
+                  const comp = window.getComputedStyle(el);
+                  if (comp.color && (comp.color.includes('oklab') || comp.color.includes('oklch'))) el.style.color = toStdColor(comp.color);
+                  if (comp.backgroundColor && (comp.backgroundColor.includes('oklab') || comp.backgroundColor.includes('oklch'))) el.style.backgroundColor = toStdColor(comp.backgroundColor);
+                  if (comp.borderColor && (comp.borderColor.includes('oklab') || comp.borderColor.includes('oklch'))) el.style.borderColor = toStdColor(comp.borderColor);
+                } catch(e) {}
+              });
+            } catch(e) {}
+          };
+
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: false,
+            backgroundColor: '#FFFDF8',
+            onclone: sanitizeOklab
+          });
+          const safeTitle = (outfit.title || GARMENTS[outfit.garmentId]?.name || 'lookbook-story')
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+          const fileName = `lookbook-${safeTitle}-${new Date().toISOString().slice(0, 10)}.png`;
+
+          if (canvas.toBlob) {
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                const image = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = image;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                return;
+              }
+              const blobUrl = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = fileName;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+            }, 'image/png');
+          } else {
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        } catch (err) {
+          console.error('Lỗi khi xuất ảnh Lookbook:', err);
+        } finally {
+          setIsExporting(false);
+        }
+      };
+
+      // Xuất và tải ảnh visualizer hiện tại thành PNG
+      const handleExportVisualizerPNG = async () => {
+        setIsExporting(true);
+        try {
+          if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+          }
+          const element = document.getElementById('visualizer-canvas-capture');
+          if (!element) return;
+          const canvas = await html2canvas(element, {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#FAF7F2',
+            ignoreElements: (el) => el.getAttribute('data-html2canvas-ignore') === 'true'
+          });
+          const image = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = image;
+          link.download = `hoasacviet-${(GARMENTS[outfit.garmentId]?.name || 'ban-phoi')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')}.png`;
+          link.click();
+        } catch (err) {
+          console.error('Lỗi khi tải ảnh visualizer:', err);
+        } finally {
+          setIsExporting(false);
+        }
+      };
+
+      return (
+        <div className="min-h-screen flex flex-col bg-[#FAF7F2] text-[#2C241D]">
+          {/* THANH HEADER CHUẨN THỜI TRANG CÔNG NGHỆ 3 CỤM PHÂN MINH */}
+          <header className="sticky top-0 z-[1000] bg-[#FDFAF5]/95 backdrop-blur-md border-b border-amber-200/50 shadow-xs px-4 sm:px-6 md:px-8 py-3 transition-all">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              
+              {/* 1. CỤM TRÁI: LOGO & SLOGAN (CÓ KHOẢNG ĐỆM TRÁI) */}
+              <div 
+                className="flex flex-col cursor-pointer select-none pl-2 sm:pl-4 group text-left"
+                onClick={() => { setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              >
+                <span className="font-display font-bold text-xl leading-none text-slate-900 tracking-wide group-hover:text-[#A82824] transition-colors">
+                  HỌA SẮC VIỆT
+                </span>
+                <span className="text-[10px] tracking-widest text-amber-800/80 uppercase font-medium mt-1 whitespace-nowrap block">
+                  Dệt Tương Lai Từ Nét Xưa
+                </span>
+              </div>
+
+              {/* 2. CỤM GIỮA: 4 TAB ĐIỀU HƯỚNG NỘI DUNG LỚN (TYPOGRAPHY THUẦN CHẤT) */}
+              <nav className="hidden md:flex items-center gap-7 lg:gap-8">
+                {[
+                  { id: 'home', label: 'Trang Chủ' },
+                  { id: 'studio', label: 'Studio Phối Đồ' },
+                  { id: 'heritage', label: 'Kho Tàng Di Sản' },
+                  { id: 'rules', label: 'Quy Chuẩn Cổ Phục' },
+                ].map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => { setActiveTab(tab.id); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      className={`relative py-1 text-[15px] font-display transition-all cursor-pointer ${
+                        isActive
+                          ? 'text-[#A82824] font-bold'
+                          : 'text-[#444444] hover:text-[#A82824] font-medium'
+                      }`}
+                    >
+                      {tab.label}
+                      {isActive && (
+                        <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[#A82824] rounded-full animate-fadeIn" />
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+
+              {/* 3. CỤM PHẢI: 3 TIỆN ÍCH TINH GỌN */}
+              <div className="flex items-center gap-2 md:gap-3">
+                {/* Thành phần 1: Nút tròn Hướng Dẫn 30s */}
+                <button
+                  type="button"
+                  onClick={() => setIsQuickGuideOpen(true)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center bg-white/80 hover:bg-amber-100/70 border border-amber-200/80 text-amber-900 text-xs shadow-2xs transition-all hover:scale-105 cursor-pointer"
+                  title="Hướng dẫn phối đồ 30s"
+                >
+                  💡
+                </button>
+
+                {/* Thành phần 2: Nút Lookbook Outline với Badge đỏ son */}
+                <button
+                  type="button"
+                  onClick={() => { setLookbookTab(activeTab === 'studio' ? 'card' : 'hub'); setIsLookbookOpen(true); }}
+                  className="relative flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-amber-300/80 hover:bg-amber-50/70 text-xs font-semibold text-slate-800 transition-all shadow-2xs cursor-pointer"
+                >
+                  <span>📖 Lookbook</span>
+                  <span className="px-1.5 py-0.2 rounded-full bg-[#A82824] text-white text-[10px] font-bold">
+                    {savedLookbook.length}
+                  </span>
+                </button>
+
+                {/* Thành phần 3: Cụm Tài Khoản Thống Nhất */}
+                {currentUser ? (
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white hover:bg-amber-50/80 border border-amber-300/80 text-xs font-semibold text-slate-900 transition-all shadow-2xs cursor-pointer"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="max-w-[120px] truncate">👤 {currentUser.name}</span>
+                    </button>
+                    {isUserMenuOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-52 bg-[#FFFDF9] rounded-2xl border-2 border-[#D4AF37] shadow-2xl py-2 z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
+                        <div className="px-3 py-1.5 border-b border-[#EDE7DC] font-bold">{currentUser.name}</div>
+                        <button onClick={() => { setIsUserMenuOpen(false); setLookbookTab('hub'); setIsLookbookOpen(true); }} className="w-full px-3 py-2 text-left hover:bg-[#FAF7F2] block cursor-pointer">Lookbook của tôi</button>
+                        <button onClick={() => { setCurrentUser(null); setIsUserMenuOpen(false); }} className="w-full px-3 py-2 text-left text-[#B83227] font-bold hover:bg-red-50 block cursor-pointer">Đăng xuất</button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50/80 hover:bg-amber-100 border border-amber-300 text-xs font-semibold text-amber-900 transition-all shadow-2xs cursor-pointer"
+                  >
+                    <span>🔑</span>
+                    <span>Đăng Nhập (Khách: {savedLookbook.length}/3)</span>
+                  </button>
+                )}
+
+                {/* Mobile Navigation Toggle (md:hidden) */}
+                <button
+                  onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+                  className="md:hidden flex items-center justify-center p-2 rounded-xl text-[#5C5346] hover:bg-[#EAE2D2] border border-[#D6CEBE] cursor-pointer"
+                  title="Menu điều hướng"
+                >
+                  {isMobileNavOpen ? <span className="font-bold text-[#B83227]">✕</span> : <span>☰</span>}
+                </button>
+              </div>
+
+            </div>
+          </header>
+
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+            
+            {/* ========================================================
+                TAB 1: TRANG CHỦ (LANDING PAGE - 4 PHÂN ĐOẠN)
+               ======================================================== */}
+            {activeTab === 'home' && (
+              <div className="space-y-16 pb-12">
+                {/* PHÂN ĐOẠN 1: HERO SECTION */}
+                <section className="pt-4 sm:pt-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                  <div className="lg:col-span-7 space-y-5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#B83227]/10 text-[#B83227] text-xs font-bold">
+                      <span className="w-2 h-2 rounded-full bg-[#B83227] animate-pulse"></span>
+                      <span>Nền tảng Phối Đồ Cổ Phục Đương Đại cho Thế Hệ Trẻ</span>
+                    </div>
+
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-serif font-black text-[#2C241D] leading-[1.15]">
+                      Họa Sắc Việt – <br />
+                      <span className="text-[#B83227]">Nét Cổ Truyền,</span> Dáng Thời Nay
+                    </h1>
+
+                    <p className="text-base sm:text-lg text-[#5C5346] leading-relaxed max-w-2xl font-normal">
+                      Trợ lý AI Stylist tiên phong giúp thế hệ trẻ khám phá, tự tay remix cổ phục và gìn giữ trọn vẹn hồn cốt dân tộc trong từng nhịp thở đương đại.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                      <button
+                        onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="px-6 py-3.5 text-sm sm:text-base font-bold text-white bg-[#B83227] hover:bg-[#99261c] active:scale-95 rounded-2xl shadow-lg shadow-[#B83227]/25 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <span>✨ Trải Nghiệm Studio Phối Đồ</span>
+                        <span>➔</span>
+                      </button>
+
+                      <button
+                        onClick={() => { setActiveTab('heritage'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className="px-6 py-3.5 text-sm sm:text-base font-semibold text-[#1B3B6F] bg-white hover:bg-[#FAF7F2] active:scale-95 border-2 border-[#D4AF37]/60 rounded-2xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        <span>📖 Khám Phá Kho Tàng Di Sản</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Collage Mockup Card */}
+                  <div className="lg:col-span-5 relative">
+                    <div className="relative bg-[#FFFDF9] rounded-3xl border-2 border-[#D6CEBE] p-5 shadow-xl space-y-4">
+                      <div className="aspect-[4/3] rounded-2xl bg-gradient-to-tr from-[#1B3B6F] to-[#2C5E43] p-6 flex flex-col justify-between text-white relative overflow-hidden">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono uppercase bg-white/20 px-2 py-0.5 rounded">Smart Casual Remix</span>
+                          <h3 className="text-xl font-serif font-bold">Áo Ngũ Thân Chẽn x Blazer & Sneaker</h3>
+                        </div>
+                        <div className="text-xs text-amber-200">
+                          ✦ Tôn dáng hiện đại · Vạt Hữu Nhậm đoan trang ✦
+                        </div>
+                      </div>
+                      <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#EDE7DC] flex items-center justify-between">
+                        <span className="text-xs font-bold text-emerald-800">
+                          ✓ 100% Chuẩn Mực Văn Hóa – Khuyên Dùng Cho Gen Z
+                        </span>
+                        <button
+                          onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          className="text-xs font-bold text-[#B83227] underline"
+                        >
+                          Phối Thử ➔
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* PHÂN ĐOẠN 2: 3 TRỤ CỘT CỐT LÕI */}
+                <section className="space-y-6">
+                  <div className="text-center max-w-xl mx-auto space-y-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#B83227]">Vì Sao Chọn Chúng Tôi</span>
+                    <h2 className="text-3xl font-serif font-black text-[#2C241D]">3 Trụ Cột Đột Phá</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="p-6 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-3">
+                      <div className="text-3xl">🤖</div>
+                      <h3 className="text-lg font-serif font-bold text-[#2C241D]">AI Stylist Thông Minh Theo Ngữ Cảnh</h3>
+                      <p className="text-xs text-[#5C5346] leading-relaxed">
+                        Tự động phân tích thời tiết, địa điểm và sự kiện (Kỷ yếu, dạo phố cafe, trẩy hội du xuân) để gợi ý set đồ vừa tôn dáng, vừa êm ái di chuyển suốt ngày dài.
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-3">
+                      <div className="text-3xl">📜</div>
+                      <h3 className="text-lg font-serif font-bold text-[#2C241D]">Thẻ Tri Thức Văn Hóa 30 Giây</h3>
+                      <p className="text-xs text-[#5C5346] leading-relaxed">
+                        Giải mã ý nghĩa thâm sâu của tiền nhân chỉ trong một chạm: 5 cúc Ngũ Thường, Đạo cài vạt Hữu Nhậm, và triết lý Tứ Thân Phụ Mẫu bao bọc chở che.
+                      </p>
+                    </div>
+
+                    <div className="p-6 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-3">
+                      <div className="text-3xl">🛡️</div>
+                      <h3 className="text-lg font-serif font-bold text-[#2C241D]">Bộ Lọc Cảnh Báo Lệch Chuẩn</h3>
+                      <p className="text-xs text-[#5C5346] leading-relaxed">
+                        Bộ kiểm duyệt thông minh tự động ngăn chặn các lỗi phối lai căng, phản cảm (như cài vạt tả nhậm của đồ tang, mặc short rách hay đai thắt Obi) nhằm bảo vệ tính nguyên bản của di sản.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                {/* PHÂN ĐOẠN 3: BỘ SƯU TẬP 1-CLICK (QUICK-START PRESETS) */}
+                <section className="space-y-6">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#B83227]">Bộ Sưu Tập 1-Click</span>
+                      <h2 className="text-3xl font-serif font-black text-[#2C241D]">Concept Phối Đồ Sẵn Theo Nhu Cầu</h2>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Concept 1 */}
+                    <div className="p-5 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-4 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <span className="text-2xl">🎓</span>
+                        <h3 className="text-lg font-serif font-bold text-[#2C241D]">Concept Kỷ Yếu Bách Niên</h3>
+                        <p className="text-xs text-[#5C5346] leading-relaxed">
+                          Áo Tấc tay thụng hoàng triều kết hợp Sneaker retro kem. Đĩnh đạc, trang nghiêm cho ngày lễ tốt nghiệp nhưng vẫn năng động, êm chân.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleLaunchConcept({
+                          garmentId: 'ao_tac',
+                          mainColor: COLORS[0],
+                          bottom: 'quan_lua',
+                          headwear: 'khan_dong'
+                        })}
+                        className="w-full py-2.5 bg-[#B83227] hover:bg-[#99261c] text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                      >
+                        ✦ Phối Set Kỷ Yếu Này
+                      </button>
+                    </div>
+
+                    {/* Concept 2 */}
+                    <div className="p-5 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-4 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <span className="text-2xl">☕</span>
+                        <h3 className="text-lg font-serif font-bold text-[#2C241D]">Concept Phố Thị Trí Thức</h3>
+                        <p className="text-xs text-[#5C5346] leading-relaxed">
+                          Áo Chẽn ngũ thân ôm gọn, khoác Blazer oversize mỏng, Túi canvas. Thanh lịch, hiện đại, chuẩn phong cách Smart Casual dạo phố cuối tuần.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleLaunchConcept({
+                          garmentId: 'ao_chen',
+                          mainColor: COLORS[1],
+                          bottom: 'quan_lua',
+                          headwear: 'none'
+                        })}
+                        className="w-full py-2.5 bg-[#1B3B6F] hover:bg-[#152e57] text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                      >
+                        ✦ Phối Set Phố Thị Này
+                      </button>
+                    </div>
+
+                    {/* Concept 3 */}
+                    <div className="p-5 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-4 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <span className="text-2xl">🏮</span>
+                        <h3 className="text-lg font-serif font-bold text-[#2C241D]">Concept Du Xuân Trẩy Hội</h3>
+                        <p className="text-xs text-[#5C5346] leading-relaxed">
+                          Áo Tứ Thân Kinh Bắc / Yếm Hồng Thắm, nón quai thao & quạt xếp lụa. Duyên dáng, phóng khoáng, nổi bật trong mọi khung hình Tết truyền thống.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleLaunchConcept({
+                          garmentId: 'ao_tu_than',
+                          mainColor: COLORS[4],
+                          bottom: 'quan_lua',
+                          headwear: 'khan_dong'
+                        })}
+                        className="w-full py-2.5 bg-[#B83227] hover:bg-[#99261c] text-white font-bold text-xs rounded-xl transition-all cursor-pointer"
+                      >
+                        ✦ Phối Set Du Xuân Này
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                {/* PHÂN ĐOẠN 4: BANNER CHUYỂN TIẾP */}
+                <section className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-[#1B3B6F] to-[#0F2347] text-white text-center space-y-4 border-2 border-[#D4AF37]/50 shadow-xl">
+                  <h2 className="text-2xl sm:text-3xl font-serif font-bold">
+                    Bạn đã sẵn sàng tạo nên bản phối di sản của riêng mình?
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-200 max-w-lg mx-auto">
+                    Bước vào Studio để tùy biến phom dáng, phối màu Ngũ Hành và xuất thẻ Lookbook chuẩn mực di sản.
+                  </p>
+                  <div>
+                    <button
+                      onClick={() => { setActiveTab('studio'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      className="px-8 py-3.5 text-sm font-black text-[#1B3B6F] bg-gradient-to-r from-[#FEE180] via-[#D4AF37] to-[#B38022] rounded-2xl shadow-xl transition-all cursor-pointer"
+                    >
+                      🚀 Bắt Đầu Phối Đồ Ngay
+                    </button>
+                  </div>
+                </section>
+              </div>
+            )}
+
+            {/* ========================================================
+                TAB 2: STUDIO PHỐI ĐỒ (MAIN WORKBENCH)
+               ======================================================== */}
+            {activeTab === 'studio' && (
+              <div className="space-y-5">
+                {/* Tour Điểm 1: Thanh Sự Kiện & AI Prompt Bar + Nút Xem Tour Giới Thiệu */}
+                <div className={`p-3.5 bg-white rounded-2xl border border-[#D6CEBE] flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${tourStep === 1 ? 'relative z-50 ring-4 ring-[#D4AF37]' : ''}`}>
+                  <div className="text-xs">
+                    <strong className="font-serif text-[#2C241D] text-sm block">✦ Trợ Lý AI Stylist & Bối Cảnh Sự Kiện</strong>
+                    <span className="text-[#7A6E5F]">Chọn sự kiện, thời tiết hoặc dùng mẫu 1-chạm để lên đồ nhanh.</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setTourStep(1)}
+                      className="px-3 py-1.5 text-xs font-bold text-[#8A5A19] bg-amber-50 hover:bg-amber-100 border border-[#D4AF37] rounded-xl cursor-pointer"
+                    >
+                      🧭 Xem Tour Giới Thiệu
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Visualizer Column (Tour Điểm 3) */}
+                <div className={`lg:col-span-5 sticky top-16 md:top-20 lg:top-20 max-h-[calc(100dvh-4.5rem)] md:max-h-[calc(100dvh-5.5rem)] overflow-y-auto overflow-x-hidden overscroll-contain pr-1 w-full space-y-4 rounded-3xl transition-all duration-300 z-20 ${tourStep === 3 ? 'relative z-50 ring-4 ring-[#D4AF37] bg-[#FAF7F2] p-2' : ''}`}>
+                  {/* 2D Canvas Container with Floating Badges */}
+                  <div
+                    id="visualizer-canvas-capture"
+                    key={shakeKey}
+                    className={`relative h-[56vh] sm:h-[62vh] md:h-[68vh] min-h-[400px] sm:min-h-[460px] md:min-h-[520px] max-h-[680px] rounded-3xl bg-gradient-to-b from-[#F7F3EB] to-[#EDE7DC] border-2 p-3 flex flex-col items-center justify-between overflow-hidden shadow-lg transition-all ${
+                      !authenticity.isPerfect ? 'border-[#B83227] animate-shake ring-4 ring-rose-400/20' : 'border-[#D6CEBE]'
+                    }`}
+                  >
+                    {/* Top Controls Bar: Tách rời 2 khối với khoảng thở gap 12px (chống chồng chéo) */}
+                    <div
+                      data-html2canvas-ignore="true"
+                      className="absolute top-3 inset-x-3 z-30 flex items-center justify-between gap-3 pointer-events-none"
+                    >
+                      {/* Khối 1: Huy hiệu xanh ✓ 100% Chuẩn Mực độc lập bên trái */}
+                      <div className="pointer-events-auto shrink-0 flex items-center gap-1.5">
+                        {authenticity.isPerfect ? (
+                          <div className="backdrop-blur-md bg-emerald-800/90 text-white border border-emerald-400 text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm font-medium">
+                            <span className="whitespace-nowrap">✓ 100% Chuẩn Mực</span>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={handleRestoreCompliant}
+                            className="backdrop-blur-md bg-red-800/90 hover:bg-red-700 text-white border border-red-400 text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md animate-pulse cursor-pointer font-bold transition-all"
+                            title="Phát hiện yếu tố lệch chuẩn - Bấm để tự động sửa ngay"
+                          >
+                            <span className="whitespace-nowrap">⚠️ Lệch Chuẩn</span>
+                            <span className="text-[10px] bg-white/20 px-1.5 py-0.2 rounded-md font-semibold">Sửa ngay</span>
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Khối 2: Dải thông số nhân vật & Tinh gọn dãy icon */}
+                      <div className="pointer-events-auto flex items-center gap-3 p-1 rounded-full bg-white/85 backdrop-blur-md border border-amber-200/80 shadow-sm text-xs ml-auto">
+                        <div className="flex items-center gap-1.5 border-r border-amber-200/80 pr-2">
+                          <button
+                            type="button"
+                            onClick={() => setOutfit(p => ({ ...p, gender: p.gender === 'male' ? 'female' : 'male', height: p.gender === 'male' ? 162 : 172, weight: p.gender === 'male' ? 52 : 65 }))}
+                            className="px-2 py-1 rounded-full font-bold bg-amber-100 hover:bg-amber-200 text-[#2C241D] cursor-pointer"
+                          >
+                            {outfit.gender === 'male' ? '👨 Nam' : '👩 Nữ'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsBodyOpen(!isBodyOpen)}
+                            className={`px-2 py-1 rounded-full font-semibold text-[11px] cursor-pointer ${isBodyOpen ? 'bg-[#1B3B6F] text-white' : 'bg-stone-100 hover:bg-stone-200 text-[#2C241D]'}`}
+                          >
+                            <span className="whitespace-nowrap">📏 {outfit.height}cm · {outfit.weight}kg</span>
+                          </button>
+                        </div>
+
+                        {/* Dãy icon tinh gọn: [ 📷 ] (Chụp ảnh/Tải PNG), [ ⚖️ ] (So sánh) */}
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={handleExportVisualizerPNG}
+                            className="rounded-full cursor-pointer text-[#A82824] hover:bg-amber-100/80 bg-stone-50 flex items-center justify-center font-bold active:scale-95"
+                            style={{ padding: '6px 10px' }}
+                            title="Chụp ảnh / Tải ảnh PNG Avatar"
+                          >
+                            📷
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsCompareOpen(true)}
+                            className="rounded-full cursor-pointer text-[#1B3B6F] hover:bg-blue-100/80 bg-stone-50 flex items-center justify-center font-bold active:scale-95"
+                            style={{ padding: '6px 10px' }}
+                            title="So sánh A/B"
+                          >
+                            ⚖️
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Collapsible Body Form Popover */}
+                    {isBodyOpen && (
+                      <div data-html2canvas-ignore="true" className="absolute top-12 right-3 z-40 w-72 p-3 bg-white/95 backdrop-blur-md rounded-2xl border border-[#D4AF37] shadow-xl space-y-2 text-xs">
+                        <div className="flex justify-between font-bold">
+                          <span>Chiều cao:</span>
+                          <span className="text-[#1B3B6F]">{outfit.height} cm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="145"
+                          max="195"
+                          value={outfit.height}
+                          onChange={(e) => setOutfit(p => ({ ...p, height: parseInt(e.target.value) }))}
+                          className="w-full accent-[#1B3B6F]"
+                        />
+                        <div className="flex justify-between font-bold">
+                          <span>Cân nặng:</span>
+                          <span className="text-[#B83227]">{outfit.weight} kg</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="38"
+                          max="105"
+                          value={outfit.weight}
+                          onChange={(e) => setOutfit(p => ({ ...p, weight: parseInt(e.target.value) }))}
+                          className="w-full accent-[#B83227]"
+                        />
+                      </div>
+                    )}
+                    {!authenticity.isPerfect && (
+                      <div className="absolute top-10 right-4 z-30 transform rotate-[-12deg] bg-rose-600/20 border-2 border-rose-600 backdrop-blur-xs px-3 py-1 rounded-xl shadow-lg text-center">
+                        <span className="text-xs font-black text-rose-700 uppercase block tracking-wider">⚠️ LỆCH CHUẨN DI SẢN</span>
+                      </div>
+                    )}
+
+                    <div className="relative z-10 w-full max-w-[320px] h-[360px] flex items-center justify-center">
+                      <svg viewBox="0 0 300 420" className="w-full h-full drop-shadow-md select-none">
+                        {/* Ancient Pavement Ground in Standalone Canvas */}
+                        <path d="M 0 380 L 300 380 L 300 420 L 0 420 Z" fill="#D6C8B8" opacity="0.5" />
+                        <line x1="0" y1="380" x2="300" y2="380" stroke="#9E8F7C" strokeWidth="2" />
+                        <line x1="60" y1="380" x2="30" y2="420" stroke="#BAAA96" strokeWidth="1" />
+                        <line x1="150" y1="380" x2="150" y2="420" stroke="#BAAA96" strokeWidth="1" />
+                        <line x1="240" y1="380" x2="270" y2="420" stroke="#BAAA96" strokeWidth="1" />
+
+                        <g transform={`translate(150, 384) scale(${Math.max(0.85, Math.min(1.22, 1 + (outfit.weight - (outfit.gender === 'male' ? 65 : 52)) * 0.0042)).toFixed(3)}, ${Math.max(0.88, Math.min(1.15, 1 + (outfit.height - (outfit.gender === 'male' ? 172 : 162)) * 0.0035)).toFixed(3)}) translate(-150, -384)`}>
+                        {/* 1. Ground Contact Shadow (Chống lơ lửng) */}
+                        <ellipse cx="150" cy="386" rx={outfit.gender === 'male' ? "76" : "64"} ry="9" fill="#1C1917" opacity="0.25" />
+                        <ellipse cx="150" cy="385" rx={outfit.gender === 'male' ? "56" : "46"} ry="6" fill="#1C1917" opacity="0.38" />
+                        {outfit.gender === 'male' ? (
+                          <>
+                            <ellipse cx="118" cy="384" rx="20" ry="4" fill="#0C0A09" opacity="0.65" />
+                            <ellipse cx="182" cy="384" rx="20" ry="4" fill="#0C0A09" opacity="0.65" />
+                          </>
+                        ) : (
+                          <>
+                            <ellipse cx="138" cy="384" rx="14" ry="3.5" fill="#0C0A09" opacity="0.6" />
+                            <ellipse cx="162" cy="384" rx="14" ry="3.5" fill="#0C0A09" opacity="0.6" />
+                          </>
+                        )}
+
+                        {/* 2. Lower Garment / Quần Lụa / Váy */}
+                        {outfit.bottom === 'quan_short_rach' ? (
+                          <g>
+                            <rect x={outfit.gender === 'male' ? "120" : "130"} y="290" width="16" height="80" rx="4" fill={outfit.gender === 'male' ? "#E8C3AB" : "#FCEFE7"} />
+                            <rect x={outfit.gender === 'male' ? "164" : "154"} y="290" width="16" height="80" rx="4" fill={outfit.gender === 'male' ? "#E8C3AB" : "#FCEFE7"} />
+                            <path
+                              d={outfit.gender === 'male' ? "M114 260 L186 260 L184 292 L158 292 L154 276 L146 276 L142 292 L116 292 Z" : "M124 260 L176 260 L174 292 L156 292 L153 278 L147 278 L144 292 L126 292 Z"}
+                              fill="#5B7C99"
+                              stroke="#385470"
+                              strokeWidth="1.5"
+                            />
+                          </g>
+                        ) : (
+                          <g>
+                            {outfit.gender === 'male' ? (
+                              <>
+                                <path d="M112 220 L146 220 L142 372 L104 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M154 220 L188 220 L196 372 L158 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                              </>
+                            ) : (
+                              <>
+                                <path d="M126 224 L149 224 L146 372 L124 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M151 224 L174 224 L176 372 L154 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                              </>
+                            )}
+                          </g>
+                        )}
+
+                        {/* Hài / Giày theo giới tính */}
+                        {outfit.gender === 'male' ? (
+                          <g>
+                            <path d="M106 372 Q118 368 130 372 L128 383 L106 383 Z" fill="#7A1C28" stroke="#4A1018" strokeWidth="0.6" />
+                            <path d="M170 372 Q182 368 194 372 L194 383 L172 383 Z" fill="#7A1C28" stroke="#4A1018" strokeWidth="0.6" />
+                            <line x1="110" y1="375" x2="126" y2="375" stroke="#D4AF37" strokeWidth="1" />
+                            <line x1="174" y1="375" x2="190" y2="375" stroke="#D4AF37" strokeWidth="1" />
+                          </g>
+                        ) : (
+                          <g>
+                            <path d="M128 375 Q135 369 146 373 L145 382 Q136 383 129 380 Q127 377 128 375 Z" fill="#881B28" stroke="#4A1018" strokeWidth="0.5" />
+                            <path d="M154 373 Q165 369 172 375 Q173 377 171 380 Q164 383 155 382 Z" fill="#881B28" stroke="#4A1018" strokeWidth="0.5" />
+                            <circle cx="135" cy="377" r="1.5" fill="#D4AF37" />
+                            <circle cx="165" cy="377" r="1.5" fill="#D4AF37" />
+                          </g>
+                        )}
+
+                        {/* 3. Thân Áo (Phom quả chuông chữ A nữ vs chữ H nam) */}
+                        <path
+                          d={
+                            outfit.gender === 'male'
+                              ? 'M126 112 L174 112 L182 170 L192 345 L108 345 L118 170 Z'
+                              : 'M136 118 L164 118 C168 140 166 160 162 180 C172 230 186 290 195 345 L105 345 C114 290 128 230 138 180 C134 160 132 140 136 118 Z'
+                          }
+                          fill={outfit.mainColor.hex}
+                          stroke="#5C5346"
+                          strokeWidth="0.5"
+                        />
+                        {/* Cổ Lập Lĩnh */}
+                        <path
+                          d={outfit.gender === 'male' ? "M132 104 Q150 108 168 104 L166 118 Q150 122 134 118 Z" : "M135 106 Q150 110 165 106 L163 118 Q150 122 137 118 Z"}
+                          fill={outfit.mainColor.hex}
+                          stroke="#5C5346"
+                          strokeWidth="0.5"
+                        />
+                        {/* Nẹp vạt áo Hữu Nhậm / Tả Nhậm */}
+                        <path
+                          d={outfit.lapelDirection === 'ta_nham' ? 'M146 114 Q134 135 124 165 L122 250' : 'M154 114 Q166 135 176 165 L178 250'}
+                          stroke={outfit.lapelDirection === 'ta_nham' ? '#B83227' : '#D4AF37'}
+                          strokeWidth="2"
+                          strokeDasharray={outfit.lapelDirection === 'ta_nham' ? '3,2' : 'none'}
+                          fill="none"
+                        />
+                        {/* 5 Khuy Ngũ Thường */}
+                        <g fill="#D4AF37" stroke="#2C241D" strokeWidth="0.5">
+                          <circle cx="150" cy="118" r="2.2" />
+                          <circle cx={outfit.lapelDirection === 'ta_nham' ? 140 : 160} cy="128" r="2.2" />
+                          <circle cx={outfit.lapelDirection === 'ta_nham' ? 132 : 168} cy="144" r="2.2" />
+                          <circle cx={outfit.lapelDirection === 'ta_nham' ? 126 : 174} cy="162" r="2.2" />
+                          <circle cx={outfit.lapelDirection === 'ta_nham' ? 123 : 177} cy="184" r="2.2" />
+                        </g>
+
+                        {/* 4. Tay Áo & Tay Người */}
+                        {outfit.garmentId === 'ao_tac' ? (
+                          <g>
+                            <path d={outfit.gender === 'male' ? "M126 112 L68 160 L54 280 L104 280 L118 170 Z" : "M136 118 L80 160 L68 280 L118 280 L130 170 Z"} fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                            <path d={outfit.gender === 'male' ? "M174 112 L232 160 L246 280 L196 280 L182 170 Z" : "M164 118 L220 160 L232 280 L182 280 L170 170 Z"} fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                            <ellipse cx={outfit.gender === 'male' ? "79" : "93"} cy="280" rx="25" ry="5" fill="#FAF7F2" opacity="0.8" />
+                            <ellipse cx={outfit.gender === 'male' ? "221" : "207"} cy="280" rx="25" ry="5" fill="#FAF7F2" opacity="0.8" />
+                            {outfit.gender === 'male' ? (
+                              <>
+                                <path d="M75 277 C74 275 79 274 83 276 L84 285 C84 288 80 289 78 288 Z" fill="#E8C3AB" />
+                                <path d="M217 277 C217 275 221 274 225 276 L225 285 C225 288 222 289 219 288 Z" fill="#E8C3AB" />
+                              </>
+                            ) : (
+                              <>
+                                <path d="M90 277 C89 275 94 274 98 276 L98 285 C98 288 94 289 92 288 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                                <path d="M202 277 C202 275 206 274 210 276 L210 285 C210 288 207 289 204 288 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                              </>
+                            )}
+                          </g>
+                        ) : (
+                          <g>
+                            {outfit.gender === 'male' ? (
+                              <>
+                                <path d="M174 112 L206 150 L202 230 L190 230 L180 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M202 226 C204 228 204 238 201 241 C198 243 194 242 193 237 L193 226 Z" fill="#E8C3AB" />
+                                <path d="M126 112 L94 150 L110 215 L124 210 L118 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M110 210 C108 212 110 220 114 222 C118 222 120 218 119 212 Z" fill="#E8C3AB" />
+                              </>
+                            ) : (
+                              <>
+                                <path d="M136 118 L104 155 L124 218 L138 214 L128 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M164 118 L196 155 L176 218 L162 214 L172 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                <path d="M124 214 C123 216 128 224 133 223 C137 222 138 216 136 212 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                                <path d="M176 214 C177 216 172 224 167 223 C163 222 162 216 164 212 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                              </>
+                            )}
+                          </g>
+                        )}
+
+                        {/* 5. Cổ, Khuôn Mặt & Nét Vẽ */}
+                        <path
+                          d={outfit.gender === 'male' ? "M139 90 L135 118 L165 118 L161 90 Z" : "M142 89 L138 116 L162 116 L158 89 Z"}
+                          fill={outfit.gender === 'male' ? "#E8C3AB" : "#FCEFE7"}
+                        />
+                        {/* Khuôn mặt trái xoan nữ vs chữ điền nam */}
+                        <path
+                          d={
+                            outfit.gender === 'male'
+                              ? "M132 58 C132 46 139 42 150 42 C161 42 168 46 168 58 C168 76 163 88 150 89 C137 88 132 76 132 58 Z"
+                              : "M134 60 C134 46 141 42 150 42 C159 42 166 46 166 60 C166 78 159 88 150 88 C141 88 134 78 134 60 Z"
+                          }
+                          fill={outfit.gender === 'male' ? "#F4CFBA" : "#FCEFE7"}
+                          stroke={outfit.gender === 'male' ? "#D9A88F" : "#E6C8B8"}
+                          strokeWidth="0.6"
+                        />
+                        {/* Tai & Khuyên tai */}
+                        {outfit.gender === 'male' ? (
+                          <>
+                            <path d="M132 63 C130 63 129 73 132 75 Z" fill="#E8C3AB" />
+                            <path d="M168 63 C170 63 171 73 168 75 Z" fill="#E8C3AB" />
+                          </>
+                        ) : (
+                          <g>
+                            <line x1="133.5" y1="72" x2="133.5" y2="76" stroke="#D4AF37" strokeWidth="0.8" />
+                            <circle cx="133.5" cy="78.5" r="2.5" fill="#FFFDF0" stroke="#E3DAC9" strokeWidth="0.5" />
+                            <line x1="166.5" y1="72" x2="166.5" y2="76" stroke="#D4AF37" strokeWidth="0.8" />
+                            <circle cx="166.5" cy="78.5" r="2.5" fill="#FFFDF0" stroke="#E3DAC9" strokeWidth="0.5" />
+                          </g>
+                        )}
+                        {/* Chi tiết gương mặt */}
+                        {outfit.gender === 'male' ? (
+                          <>
+                            <path d="M137 63 L146 62.5" stroke="#1F1E22" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                            <path d="M154 62.5 L163 63" stroke="#1F1E22" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                            <path d="M138 68 Q142 66 146 68" stroke="#221F1E" strokeWidth="1.2" fill="none" />
+                            <ellipse cx="142" cy="69" rx="1.8" ry="1.4" fill="#221F1E" />
+                            <path d="M154 68 Q158 66 162 68" stroke="#221F1E" strokeWidth="1.2" fill="none" />
+                            <ellipse cx="158" cy="69" rx="1.8" ry="1.4" fill="#221F1E" />
+                            <path d="M150 66 L149 74 Q150.5 75.5 152 74" stroke="#C28B72" strokeWidth="0.9" fill="none" />
+                            <path d="M145 80 Q150 81.5 155 80" stroke="#A8624C" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                          </>
+                        ) : (
+                          <>
+                            <path d="M140 64 Q144 62 147.5 64" stroke="#262626" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+                            <path d="M152.5 64 Q156 62 160 64" stroke="#262626" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+                            <path d="M139.5 67.5 Q143.5 65.5 147.5 67.5" stroke="#3D2D20" strokeWidth="1" fill="none" />
+                            <ellipse cx="143.5" cy="68.5" rx="2.5" ry="1.8" fill="#1C1A19" />
+                            <circle cx="144" cy="68" r="0.7" fill="#FFFFFF" />
+                            <path d="M152.5 67.5 Q156.5 65.5 160.5 67.5" stroke="#3D2D20" strokeWidth="1" fill="none" />
+                            <ellipse cx="156.5" cy="68.5" rx="2.5" ry="1.8" fill="#1C1A19" />
+                            <circle cx="157" cy="68" r="0.7" fill="#FFFFFF" />
+                            <ellipse cx="138" cy="73" rx="3.5" ry="2" fill="#E08B7A" opacity="0.35" />
+                            <ellipse cx="162" cy="73" rx="3.5" ry="2" fill="#E08B7A" opacity="0.35" />
+                            <path d="M150 68 L149.5 74 Q150.8 75.5 152 74" stroke="#D8A890" strokeWidth="0.7" fill="none" />
+                            <path d="M146 79 Q150 80.5 154 79 Q150 83.5 146 79 Z" fill="#E05A6D" />
+                          </>
+                        )}
+
+                        {/* 6. Kiểu Tóc & Khăn Đội Đầu */}
+                        {outfit.gender === 'male' ? (
+                          <g>
+                            <ellipse cx="150" cy="50" rx="25" ry="12" fill="#18181B" stroke="#27272A" strokeWidth="0.8" />
+                            <path d="M127 52 Q150 59 173 52" stroke="#45454D" strokeWidth="1.4" fill="none" />
+                            <path d="M129 48 Q150 55 171 48" stroke="#45454D" strokeWidth="1.4" fill="none" />
+                            <path d="M132 44 Q150 51 168 44" stroke="#45454D" strokeWidth="1.4" fill="none" />
+                            <path d="M135 40 Q150 47 165 40" stroke="#45454D" strokeWidth="1.2" fill="none" />
+                          </g>
+                        ) : (
+                          <g>
+                            <path
+                              d="M150 48 Q140 52 134 62 L134 46 Q142 42 150 42 Q158 42 166 46 L166 62 Q160 52 150 48 Z"
+                              fill="#161517"
+                            />
+                            <path
+                              d="M125 54 C122 34 136 30 150 30 C164 30 178 34 175 54 C172 44 162 38 150 38 C138 38 128 44 125 54 Z"
+                              fill="#141316"
+                              stroke="#2B2832"
+                              strokeWidth="0.8"
+                            />
+                            <path d="M130 46 Q150 40 170 46" stroke="#3D3A47" strokeWidth="1.2" fill="none" opacity="0.6" />
+                            {/* Hai lọn tóc mai lơi buông thái dương */}
+                            <path d="M134 62 Q131 72 133 80" stroke="#161517" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                            <path d="M166 62 Q169 72 167 80" stroke="#161517" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                          </g>
+                        )}
+
+                        {/* 7. Phụ Kiện Cầm Tay (Hỗ trợ quạt, túi tote, clutch hoặc để tay tự nhiên) */}
+                        {outfit.handheld === 'quat_xep' || outfit.handheld === 'quat_xep_giay_do' || !outfit.handheld ? (
+                          outfit.gender === 'male' ? (
+                            <g transform="translate(108, 202) rotate(-22)">
+                              <rect x="0" y="0" width="8" height="42" rx="2" fill="#8D5B4C" stroke="#5C3B0E" strokeWidth="0.8" />
+                              <line x1="4" y1="0" x2="4" y2="42" stroke="#D4AF37" strokeWidth="0.8" />
+                              <circle cx="4" cy="40" r="1.5" fill="#D4AF37" />
+                              <line x1="4" y1="42" x2="2" y2="52" stroke="#B83227" strokeWidth="1.2" />
+                            </g>
+                          ) : (
+                            <g transform="translate(150, 214)">
+                              <circle cx="0" cy="0" r="20" fill="#FAF7F2" stroke="#D4AF37" strokeWidth="1.2" />
+                              <path d="M-6 4 Q0 -4 6 -2" stroke="#8D5B4C" strokeWidth="0.8" fill="none" />
+                              <circle cx="-1" cy="-2" r="2.5" fill="#E05A6D" />
+                              <circle cx="4" cy="-4" r="2" fill="#E05A6D" />
+                              <circle cx="0" cy="2" r="1.5" fill="#D4AF37" />
+                              <line x1="0" y1="20" x2="0" y2="38" stroke="#8D5B4C" strokeWidth="1.8" strokeLinecap="round" />
+                              <line x1="0" y1="38" x2="-2" y2="52" stroke="#D4AF37" strokeWidth="1.2" />
+                              <circle cx="-2" cy="52" r="1.2" fill="#D4AF37" />
+                            </g>
+                          )
+                        ) : outfit.handheld === 'tui_tote' || outfit.handheld === 'tui_tote_canvas' ? (
+                          outfit.gender === 'male' ? (
+                            <g transform="translate(86, 204)">
+                              <path d="M7 0 L7 -16 L23 -16 L23 0" fill="none" stroke="#2C241D" strokeWidth="1.4" />
+                              <rect x="0" y="0" width="30" height="36" rx="2" fill="#FAF7F2" stroke="#6B5E51" strokeWidth="0.8" />
+                              <circle cx="15" cy="18" r="5" fill="#1B3B6F" opacity="0.8" />
+                            </g>
+                          ) : (
+                            <g transform="translate(122, 215)">
+                              <path d="M8 0 L8 -14 L22 -14 L22 0" fill="none" stroke="#5C5346" strokeWidth="1.2" />
+                              <rect x="0" y="0" width="28" height="34" rx="2" fill="#FAF7F2" stroke="#8D5B4C" strokeWidth="0.8" />
+                              <circle cx="14" cy="15" r="4.5" fill="#B83227" opacity="0.7" />
+                            </g>
+                          )
+                        ) : null}
+
+                        {/* ANATOMY HOTSPOTS (TRA CỨU CỔ TỪ: CÁC NÚT LUÔN NHẤP NHÁY, CHỈ HIỆN THÔNG TIN KHI RÊ CHUỘT) */}
+                        {showHotspots && (
+                          <g className="anatomy-hotspots select-none">
+                            {hotspots.map(spot => {
+                              const isHovered = (hoveredHotspotId === spot.id) || (activeHotspotId === spot.id);
+                              return (
+                                <g
+                                  key={spot.id}
+                                  transform={`translate(${spot.coords.x}, ${spot.coords.y})`}
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    const nextId = activeHotspotId === spot.id ? null : spot.id;
+                                    setActiveHotspotId(nextId);
+                                    setHoveredHotspotId(nextId);
+                                  }}
+                                  onMouseEnter={() => setHoveredHotspotId(spot.id)}
+                                  onMouseLeave={() => {
+                                    setHoveredHotspotId(null);
+                                    setActiveHotspotId(null);
+                                  }}
+                                >
+                                  <circle r="26" fill="#000000" fillOpacity="0" style={{ cursor: 'pointer', pointerEvents: 'all' }} />
+                                  <g style={{ pointerEvents: 'none' }}>
+                                    <circle r={isHovered ? 14 : 11} fill="#D4AF37" opacity={isHovered ? '0.75' : '0.35'} className="animate-ping" />
+                                    <circle r={isHovered ? 9.5 : 7.5} fill={isHovered ? '#B83227' : '#D4AF37'} opacity={isHovered ? '0.6' : '0.4'} />
+                                    <circle r={isHovered ? 6.5 : 5} fill={isHovered ? '#B83227' : '#C59B27'} stroke="#FFFFFF" strokeWidth="1.5" />
+                                    <circle r={isHovered ? 2.2 : 1.6} fill="#FFFFFF" />
+                                    {isHovered && (
+                                      <g transform="translate(0, -18)">
+                                        <rect x="-35" y="-11" width="70" height="16" rx="8" fill="#2C241D" fillOpacity="0.94" stroke="#D4AF37" strokeWidth="0.8" />
+                                        <text x="0" y="0" fill="#FFFDF9" fontSize="8" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">{spot.label}</text>
+                                      </g>
+                                    )}
+                                  </g>
+                                </g>
+                              );
+                            })}
+                          </g>
+                        )}
+                        </g>
+                    </div>
+
+                    {/* Popover Tra Cứu Cổ Từ: CHỈ HIỆN KHI RÊ CHUỘT TỚI NÚT ĐÓ */}
+                    {activeHotspot && (
+                      <div
+                        className="absolute z-40 max-w-[280px] bg-[#FFFDF9]/95 backdrop-blur-md border-2 border-[#D4AF37] rounded-2xl shadow-xl p-3 text-xs text-[#2C241D] animate-in zoom-in-95 duration-150 pointer-events-none"
+                        style={{ top: activeHotspot.coords.y > 180 ? '16%' : '52%', left: '50%', transform: 'translateX(-50%)' }}
+                      >
+                        <div className="flex items-center justify-between pb-2 border-b border-[#EDE7DC]">
+                          <strong className="text-xs font-serif text-[#1B3B6F]">{activeHotspot.title}</strong>
+                          <span className="text-[10px] text-amber-700 font-semibold">{activeHotspot.label}</span>
+                        </div>
+                        <p className="mt-2 text-[11px] text-[#4A3E31] leading-relaxed">{activeHotspot.content}</p>
+                      </div>
+                    )}
+
+                    <div className="w-full flex items-center justify-between text-xs px-3 py-1.5 rounded-xl bg-white/80">
+                      <span>{authenticity.isPerfect ? '✓ 100% Chuẩn di sản' : '⚠️ Có điểm vi phạm'}</span>
+                      <strong className="font-serif">{GARMENTS[outfit.garmentId].name}</strong>
+                    </div>
+                  </div>
+
+                  {/* Authenticity Gauge */}
+                  <div className="p-3.5 bg-white rounded-2xl border border-[#D6CEBE] shadow-xs space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-serif font-bold text-[#2C241D]">Thước Đo Chuẩn Mực Di Sản: {authenticity.score}%</span>
+                      {!authenticity.isPerfect && (
+                        <button
+                          onClick={handleRestoreCompliant}
+                          className="px-2.5 py-1 text-xs font-bold text-white bg-emerald-700 rounded-xl"
+                        >
+                          Khắc phục ngay ➔
+                        </button>
+                      )}
+                    </div>
+                    <div className="w-full bg-[#EDE7DC] h-2 rounded-full overflow-hidden">
+                      <div className={`h-full ${authenticity.isPerfect ? 'bg-emerald-600' : 'bg-red-600'}`} style={{ width: `${authenticity.score}%` }}></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Controls Column (Tour Điểm 2) */}
+                <div className={`lg:col-span-7 space-y-5 rounded-3xl ${tourStep === 2 ? 'relative z-50 ring-4 ring-[#D4AF37] bg-[#FAF7F2] p-2' : ''}`}>
+                  {/* KHỐI GỢI Ý MẪU 1-CHẠM (ĐÃ TỐI ƯU LAYOUT & TRÁNH TRÀN CHỮ) */}
+                  <div className="mb-3 p-2.5 rounded-xl bg-white/75 backdrop-blur-sm border border-amber-200/70 shadow-xs">
+                    {/* Header của khối Preset */}
+                    <div className="flex items-center justify-between mb-2 px-0.5">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
+                        <span className="text-amber-500">⚡</span>
+                        <span className="font-display tracking-wide uppercase text-[11px] md:text-xs">Gợi Ý Mẫu 1-Chạm</span>
+                      </div>
+                      <span className="text-[10px] text-amber-800/75 font-medium whitespace-nowrap bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/50">
+                        Lên trọn bộ & bối cảnh
+                      </span>
+                    </div>
+
+                    {/* Lưới 3 thẻ mẫu: Cố định 3 cột đều nhau, chia 2 dòng chữ rõ ràng, KHÔNG CẮT DẤU BA CHẤM */}
+                    <div className="grid grid-cols-3 gap-1.5 md:gap-2">
+                      {/* Thẻ 1: Kỷ Yếu (Áo Tấc) */}
+                      <button
+                        type="button"
+                        onClick={() => setOutfit(p => ({ ...p, garmentId: 'ao_tac', mainColor: COLORS[6], innerColor: COLORS[3], bottomColor: COLORS[3], lapelDirection: 'huu_nham', bottom: 'quan_lua', shoes: 'sneaker_retro' }))}
+                        className="flex flex-col items-center justify-center py-2 px-1 rounded-lg border border-amber-200/80 bg-amber-50/40 hover:bg-amber-100/70 hover:border-amber-400 transition-all text-center group shadow-2xs cursor-pointer"
+                      >
+                        <span className="text-sm md:text-base mb-0.5 group-hover:scale-110 transition-transform">🎓</span>
+                        <span className="text-[11px] md:text-xs font-bold text-slate-900 group-hover:text-amber-900 leading-tight whitespace-nowrap">
+                          Kỷ Yếu
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-medium leading-tight whitespace-nowrap">
+                          (Áo Tấc)
+                        </span>
+                      </button>
+
+                      {/* Thẻ 2: Phố Cổ (Áo Chẽn) */}
+                      <button
+                        type="button"
+                        onClick={() => setOutfit(p => ({ ...p, garmentId: 'ao_chen', mainColor: COLORS[1], innerColor: COLORS[3], bottomColor: COLORS[3], lapelDirection: 'huu_nham', bottom: 'quan_lua', handheld: 'tui_tote_canvas' }))}
+                        className="flex flex-col items-center justify-center py-2 px-1 rounded-lg border border-amber-200/80 bg-amber-50/40 hover:bg-amber-100/70 hover:border-amber-400 transition-all text-center group shadow-2xs cursor-pointer"
+                      >
+                        <span className="text-sm md:text-base mb-0.5 group-hover:scale-110 transition-transform">☕</span>
+                        <span className="text-[11px] md:text-xs font-bold text-slate-900 group-hover:text-amber-900 leading-tight whitespace-nowrap">
+                          Phố Cổ
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-medium leading-tight whitespace-nowrap">
+                          (Áo Chẽn)
+                        </span>
+                      </button>
+
+                      {/* Thẻ 3: Hoàng Thành (Giao Lĩnh) */}
+                      <button
+                        type="button"
+                        onClick={() => setOutfit(p => ({ ...p, garmentId: 'ao_giao_linh', mainColor: COLORS[0], innerColor: COLORS[2], bottomColor: COLORS[3], lapelDirection: 'huu_nham', bottom: 'quan_lua', handheld: 'quat_xep_giay_do' }))}
+                        className="flex flex-col items-center justify-center py-2 px-1 rounded-lg border border-amber-200/80 bg-amber-50/40 hover:bg-amber-100/70 hover:border-amber-400 transition-all text-center group shadow-2xs cursor-pointer"
+                      >
+                        <span className="text-sm md:text-base mb-0.5 group-hover:scale-110 transition-transform">🏛️</span>
+                        <span className="text-[11px] md:text-xs font-bold text-slate-900 group-hover:text-amber-900 leading-tight whitespace-nowrap">
+                          Hoàng Thành
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-medium leading-tight whitespace-nowrap">
+                          (Giao Lĩnh)
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Select Garment */}
+                  <div className="p-4 bg-white rounded-2xl border border-[#D6CEBE] shadow-xs space-y-3">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#7A6E5F] block">1. Chọn Kiểu Dáng Cổ Phục</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {Object.values(GARMENTS).map(g => (
+                        <button
+                          key={g.id}
+                          onClick={() => setOutfit(p => ({ ...p, garmentId: g.id }))}
+                          className={`p-2.5 rounded-xl border text-left text-xs transition-all ${outfit.garmentId === g.id ? 'bg-[#1B3B6F]/5 border-[#1B3B6F] ring-1 ring-[#1B3B6F]' : 'bg-[#FAF7F2] border-[#EDE7DC]'}`}
+                        >
+                          <strong className="block text-[#2C241D]">{g.name}</strong>
+                          <span className="text-[10px] text-[#7A6E5F] line-clamp-1">{g.eraName}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Select Color & Wu Xing Harmony Engine */}
+                  <div className={`p-4 bg-white rounded-2xl border transition-all duration-300 shadow-xs space-y-4 ${
+                    harmony.isSinh ? 'border-emerald-500 glow-tuong-sinh' : harmony.isKhac ? 'border-red-400 glow-tuong-khac' : 'border-[#D6CEBE]'
+                  }`}>
+                    <div className="flex items-center justify-between border-b border-[#EDE7DC] pb-2.5">
+                      <div>
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-[#2C241D]">
+                          Động Cơ Ngũ Hành & Hòa Sắc (Color Harmony Engine)
+                        </h4>
+                        <span className="text-[11px] text-[#7A6E5F]">
+                          {harmony.phrase}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleAiAutoFixColor}
+                          className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full shadow-sm cursor-pointer transition-all active:scale-95 shrink-0 ${
+                            harmony.score < 85 || harmony.isKhac
+                              ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white animate-pulse ring-2 ring-amber-300 shadow-md'
+                              : 'bg-amber-50 hover:bg-amber-100 text-[#8A5A19] border border-[#D4AF37]/70'
+                          }`}
+                          title="Tự động phân tích hành của Áo chính và đổi màu lót trong sang hành tương sinh"
+                        >
+                          <span>✨ AI Tự Sửa Màu</span>
+                        </button>
+
+                        <div className="text-right">
+                          <span className={`text-sm font-bold font-serif ${
+                            harmony.isSinh ? 'text-emerald-700' : harmony.isKhac ? 'text-[#B83227]' : 'text-[#1B3B6F]'
+                          }`}>
+                            {harmony.score}/100
+                          </span>
+                          <span className="block text-[10px] text-[#7A6E5F]">{harmony.label}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#7A6E5F] block mb-2">Màu Áo Chính (Ngũ Sắc)</span>
+                      <div className="flex flex-wrap gap-2">
+                        {COLORS.map(c => (
+                          <button
+                            key={c.id}
+                            onClick={() => setOutfit(p => ({ ...p, mainColor: c }))}
+                            className={`w-8 h-8 rounded-full border border-black/10 transition-transform ${outfit.mainColor.id === c.id ? 'scale-110 ring-2 ring-[#B83227] ring-offset-2' : 'hover:scale-105'}`}
+                            style={{ backgroundColor: c.hex }}
+                            title={`${c.name} (${c.element})`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#7A6E5F] block mb-2">Màu Áo Lót Trong / Cánh Đi Kèm</span>
+                      <div className="flex flex-wrap gap-2">
+                        {COLORS.map(c => (
+                          <button
+                            key={c.id}
+                            onClick={() => setOutfit(p => ({ ...p, innerColor: c }))}
+                            className={`w-7 h-7 rounded-full border border-black/10 transition-transform ${outfit.innerColor?.id === c.id ? 'scale-110 ring-2 ring-[#1B3B6F] ring-offset-2' : 'hover:scale-105'}`}
+                            style={{ backgroundColor: c.hex }}
+                            title={`${c.name} (${c.element})`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sandbox */}
+                  <div className="rounded-2xl border-2 border-dashed border-amber-600/70 bg-[#FAF7F2] p-4 space-y-3">
+                    <h4 className="font-serif font-bold text-sm text-[#B83227]">
+                      🔥 Góc Thử Thách Di Sản: Thử làm sai quy chuẩn để xem AI bắt lỗi
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                      <button
+                        onClick={() => triggerChallenge({ lapelDirection: 'ta_nham' })}
+                        className="p-2 text-xs font-medium text-left rounded-xl bg-white border border-red-200 hover:bg-red-50 text-red-900"
+                      >
+                        ❌ Cài Vạt Tả Nhận (Trái đè Phải - Tang Lễ)
+                      </button>
+                      <button
+                        onClick={() => triggerChallenge({ bottom: 'quan_short_rach' })}
+                        className="p-2 text-xs font-medium text-left rounded-xl bg-white border border-red-200 hover:bg-red-50 text-red-900"
+                      >
+                        ❌ Mặc Cùng Quần Short Rách Lộ Đùi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+            )}
+
+            {/* ========================================================
+                TAB 3: KHO TÀNG DI SẢN
+               ======================================================== */}
+            {activeTab === 'heritage' && (
+              <div className="space-y-6">
+                <div className="max-w-2xl space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#B83227]">Kho Tri Thức</span>
+                  <h2 className="text-3xl font-serif font-black text-[#2C241D]">4 Dòng Cổ Phục Tiêu Biểu</h2>
+                  <p className="text-xs sm:text-sm text-[#5C5346]">Học hỏi nguồn gốc, hoàn cảnh mặc và triết lý nhân sinh của từng dòng trang phục.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {Object.values(GARMENTS).map(g => (
+                    <div key={g.id} className="p-6 bg-white rounded-3xl border border-[#D6CEBE] shadow-xs space-y-3 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <span className="text-[10px] font-mono uppercase text-[#B83227] font-bold">{g.eraName}</span>
+                        <h3 className="text-xl font-serif font-bold text-[#2C241D]">{g.name}</h3>
+                        <p className="text-xs text-[#5C5346] leading-relaxed">{g.desc}</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setOutfit(p => ({ ...p, garmentId: g.id }));
+                          setActiveTab('studio');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-full py-2 bg-[#1B3B6F] hover:bg-[#152e57] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                      >
+                        Đưa {g.name} Vào Studio Phối Đồ
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ========================================================
+                TAB 4: QUY CHUẨN CỔ PHỤC
+               ======================================================== */}
+            {activeTab === 'rules' && (
+              <div className="space-y-8">
+                <div className="max-w-2xl space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#B83227]">Bảo Tồn Bản Sắc</span>
+                  <h2 className="text-3xl font-serif font-black text-[#2C241D]">Do's & Don'ts Khi Phối Đồ Cổ Phục</h2>
+                  <p className="text-xs sm:text-sm text-[#5C5346]">Nguyên tắc cốt lõi giúp các bạn trẻ tự do sáng tạo nhưng không đánh mất hồn cốt dân tộc.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-200 space-y-3">
+                    <h3 className="text-lg font-serif font-bold text-emerald-950">✓ NÊN LÀM (DO'S)</h3>
+                    <ul className="text-xs text-emerald-900 space-y-2">
+                      <li>• Luôn cài vạt Hữu Nhậm (vạt phải đè vạt trái).</li>
+                      <li>• Giữ trang phục đáy kín đáo (quần lụa ống rộng, quần âu).</li>
+                      <li>• Tôn trọng tay áo thụng ung dung của Áo Tấc khi lễ nghi.</li>
+                      <li>• Phối phụ kiện đương đại tinh tế (sneaker trắng, loafer da).</li>
+                    </ul>
+                  </div>
+
+                  <div className="p-6 bg-red-50 rounded-3xl border border-red-200 space-y-3">
+                    <h3 className="text-lg font-serif font-bold text-red-950">✕ KHÔNG ĐƯỢC LÀM (DON'TS)</h3>
+                    <ul className="text-xs text-red-900 space-y-2">
+                      <li>• Tuyệt đối không cài vạt Tả Nhậm (đại kỵ chỉ dùng cho người đã khuất).</li>
+                      <li>• Không mặc short rách đáy hở lộ đùi qua tà áo xẻ.</li>
+                      <li>• Không xắn tay áo tấc tùy tiện khi hành lễ trang nghiêm.</li>
+                      <li>• Không lai ghép đai Obi Nhật Bản hoặc trâm cài Mãn Thanh.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* FOOTER - ĐƠN VỊ PHÁT TRIỂN UEH & DỰ ÁN DỰ THI AI ARENA 2026 */}
+          <footer className="border-t border-[#D4AF37]/40 bg-[#F4EFE6] py-8 px-4 lg:px-8 mt-12 text-xs text-[#5C5346] relative overflow-hidden">
+            <div className="max-w-7xl mx-auto space-y-5">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-4 border-b border-[#D4AF37]/25 text-center md:text-left">
+                <div>
+                  <span className="font-serif font-black text-[#B83227] text-base">HỌA SẮC VIỆT</span>
+                  <span className="text-[#D4AF37] mx-1.5">✦</span>
+                  <span className="font-semibold text-[#2C241D]">Nét Cổ Truyền, Dáng Thời Nay</span>
+                </div>
+                <button
+                  onClick={() => setIsFeedbackModalOpen(true)}
+                  className="px-4 py-2 rounded-2xl bg-white/80 hover:bg-white backdrop-blur-md border border-[#D4AF37] text-[#B83227] font-bold text-xs shadow-sm hover:shadow-[0_0_15px_rgba(212,175,55,0.45)] transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>💬 Góp Ý & Phản Hồi Về Di Sản</span>
+                </button>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
+                <div className="space-y-1 text-[#2C241D]">
+                  <div>🏛️ <strong>Đơn vị phát triển:</strong> Nhóm sinh viên Đại học Kinh tế TP.HCM (UEH).</div>
+                  <div>🏆 <strong>Dự án dự thi:</strong> Vòng Audition — Cuộc thi AI Arena Viet Nam 2026 (Đại học Quốc gia Hà Nội – Trường ĐH Công nghệ tổ chức).</div>
+                </div>
+                <div className="text-[11px] text-[#7A6E5F] md:text-right">
+                  <div>Nền tảng Định hình & Lan tỏa Cổ phục Việt Đương đại</div>
+                  <div className="text-[10.5px] text-[#8A5A19] font-semibold mt-0.5">© 2026 Họa Sắc Việt · Giữ trọn chuẩn mực – Tự hào vươn xa</div>
+                </div>
+              </div>
+            </div>
+          </footer>
+
+          {/* EMERALD TOAST NOTIFICATION FOR IN-APP FEEDBACK */}
+          {feedbackToast && (
+            <div className="fixed top-20 right-4 sm:right-6 z-50 max-w-md w-[92%] sm:w-auto p-4 rounded-2xl bg-emerald-800 text-white shadow-xl border border-emerald-500 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 text-xs sm:text-sm font-medium leading-snug">
+                <span className="text-emerald-300 font-bold text-base">✓</span>
+                <span>{feedbackToast}</span>
+              </div>
+              <button onClick={() => setFeedbackToast(null)} className="text-emerald-200 hover:text-white text-xs font-bold px-1.5 cursor-pointer">✕</button>
+            </div>
+          )}
+
+          {/* IN-APP FEEDBACK MODAL */}
+          {isFeedbackModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+              <div className="bg-gradient-to-b from-[#FFFDF9] via-[#FAF7F2] to-[#F4EFE6] rounded-3xl p-6 max-w-lg w-full border-2 border-[#D4AF37] shadow-2xl space-y-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#8A5A19] bg-amber-100/80 border border-[#D4AF37]/50 px-2.5 py-0.5 rounded-full">Hòm Thư Tri Thức & Góp Ý Di Sản</span>
+                    <h3 className="text-xl font-serif font-black text-[#2C241D] pt-1">Đồng Hành Gìn Giữ Hồn Cốt Dân Tộc</h3>
+                    <p className="text-xs text-[#5C5346] leading-relaxed">Họa Sắc Việt luôn trân trọng mọi đóng góp về tính chuẩn xác của trang phục truyền thống và trải nghiệm người dùng từ cộng đồng và các chuyên gia.</p>
+                  </div>
+                  <button onClick={() => setIsFeedbackModalOpen(false)} className="text-xs font-bold text-[#7A6E5F] p-1 cursor-pointer">✕</button>
+                </div>
+
+                {/* 1. Chọn Chủ Đề Góp Ý */}
+                <div className="space-y-1.5 text-left">
+                  <label className="text-xs font-bold text-[#2C241D] block">🏷️ Chọn Chủ Đề Góp Ý:</label>
+                  <div className="space-y-1.5">
+                    {[
+                      { id: 'chuan_muc_co_phuc', label: '👘 Góp ý về tính chuẩn mực cổ phục (Hữu nhậm, màu sắc, phom dáng)' },
+                      { id: 'phu_kien_dong_ao', label: '🪡 Đề xuất thêm phụ kiện / dòng áo mới' },
+                      { id: 'giao_dien_ai', label: '💻 Báo lỗi giao diện hoặc gợi ý tính năng AI' }
+                    ].map(topic => (
+                      <button
+                        key={topic.id}
+                        type="button"
+                        onClick={() => setFeedbackTopic(topic.id)}
+                        className={`w-full text-left p-2.5 rounded-2xl border text-xs transition-all flex items-center justify-between cursor-pointer ${
+                          feedbackTopic === topic.id
+                            ? 'bg-amber-50 border-[#D4AF37] font-bold text-[#2C241D]'
+                            : 'bg-white border-[#E3DAC9] text-[#5C5346]'
+                        }`}
+                      >
+                        <span>{topic.label}</span>
+                        {feedbackTopic === topic.id && <span className="text-[#B83227] font-bold">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Khung Nhập Lời Nhắn */}
+                <div className="space-y-1 text-left">
+                  <label className="text-xs font-bold text-[#2C241D] block">📝 Lời Nhắn & Đóng Góp Của Bạn:</label>
+                  <div className={feedbackShake ? 'animate-shake' : ''}>
+                    <textarea
+                      rows="4"
+                      value={feedbackMessage}
+                      onChange={e => {
+                        setFeedbackMessage(e.target.value);
+                        if (feedbackError) setFeedbackError(null);
+                      }}
+                      placeholder="Nhập lời nhắn, góp ý văn hóa hoặc nhận xét của bạn tại đây..."
+                      className={`w-full p-3 text-xs bg-white rounded-2xl border text-[#2C241D] focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 ${
+                        feedbackError ? 'border-[#B83227] bg-red-50/30' : 'border-[#D6CEBE]'
+                      }`}
+                    />
+                  </div>
+                  {feedbackError && <div className="text-[11px] font-bold text-[#B83227]">⚠️ {feedbackError}</div>}
+                </div>
+
+                {/* 3. Cụm Nút Hành Động */}
+                <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#E3DAC9]">
+                  <button
+                    type="button"
+                    onClick={() => setIsFeedbackModalOpen(false)}
+                    className="px-4 py-2 text-xs font-bold text-[#5C5346] bg-white border border-[#D6CEBE] rounded-xl cursor-pointer"
+                  >
+                    Để Sau
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isFeedbackSubmitting}
+                    onClick={() => {
+                      const trimmed = feedbackMessage.trim();
+                      if (trimmed.length < 5) {
+                        setFeedbackError(trimmed.length === 0 ? 'Vui lòng nhập nội dung góp ý trước khi gửi' : 'Vui lòng nhập nội dung góp ý tối thiểu 5 ký tự');
+                        setFeedbackShake(true);
+                        setTimeout(() => setFeedbackShake(false), 500);
+                        return;
+                      }
+                      setIsFeedbackSubmitting(true);
+                      setTimeout(() => {
+                        try {
+                          const raw = localStorage.getItem('hoasacviet_feedbacks');
+                          const list = raw ? JSON.parse(raw) : [];
+                          localStorage.setItem('hoasacviet_feedbacks', JSON.stringify([{ id: 'fb-' + Date.now(), topic: feedbackTopic, message: trimmed, createdAt: new Date().toISOString() }, ...list]));
+                        } catch (e) {}
+                        setIsFeedbackSubmitting(false);
+                        setFeedbackMessage('');
+                        setIsFeedbackModalOpen(false);
+                        setFeedbackToast('✨ Cảm ơn bạn! Đội ngũ Họa Sắc Việt (UEH) đã ghi nhận phản hồi để hoàn thiện sản phẩm.');
+                        setTimeout(() => setFeedbackToast(null), 3500);
+                      }, 500);
+                    }}
+                    className="px-5 py-2 text-xs font-bold text-white bg-[#B83227] hover:bg-[#99261c] rounded-xl cursor-pointer"
+                  >
+                    {isFeedbackSubmitting ? '⏳ Đang gửi...' : '✨ Gửi Góp Ý'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* LOOKBOOK MODAL & PERSONAL LOOKBOOK HUB */}
+          {isLookbookOpen && (
+            <div
+              onClick={(e) => { if (e.target === e.currentTarget) setIsLookbookOpen(false); }}
+              className="fixed inset-0 z-[1100] flex justify-center items-center p-2 sm:p-4 bg-black/75 backdrop-blur-xs animate-in fade-in duration-200"
+            >
+              <div className="relative bg-[#FAF7F2] rounded-3xl max-w-xl w-full border-2 border-[#D6CEBE] shadow-2xl h-[92vh] max-h-[820px] flex flex-col overflow-hidden my-0">
+                {/* VÙNG 1: HEADER GHIM TRÊN (SHRINK-0) */}
+                <div className="shrink-0 flex items-center justify-between px-3.5 sm:px-5 py-2.5 border-b border-[#E3DAC9] bg-white gap-2 z-10">
+                  <div className="flex items-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-[#EDE7DC]">
+                    <button onClick={() => setLookbookTab('card')} className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-colors ${lookbookTab === 'card' ? 'bg-[#B83227] text-white shadow-2xs' : 'text-[#5C5346] hover:text-[#2C241D]'}`}>Thẻ Story 9:16 (Hiện Tại)</button>
+                    <button onClick={() => setLookbookTab('hub')} className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-colors ${lookbookTab === 'hub' ? 'bg-[#1B3B6F] text-white shadow-2xs' : 'text-[#5C5346] hover:text-[#2C241D]'}`}>Personal Lookbook Hub ({savedLookbook.length})</button>
+                  </div>
+                  {/* Biểu tượng nút tròn ✕ duy nhất ở góc trên cùng bên phải */}
+                  <button
+                    type="button"
+                    onClick={() => setIsLookbookOpen(false)}
+                    className="w-8 h-8 rounded-full bg-[#F2EFE9] hover:bg-rose-100 border border-stone-300 text-stone-700 hover:text-[#A82824] flex items-center justify-center text-sm font-bold transition-all shadow-2xs hover:scale-105 cursor-pointer shrink-0"
+                    title="Đóng cửa sổ Lookbook (Esc)"
+                    aria-label="Đóng Lookbook"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {!currentUser && (
+                  <div className="shrink-0 px-3.5 sm:px-5 py-1.5 bg-amber-50 border-b border-amber-200 flex items-center justify-between gap-2 text-[11px] text-amber-950 z-10">
+                    <span>⚠️ <strong>Chế độ Khách:</strong> Lưu tạm tối đa 3 bộ. Đăng nhập để lưu vĩnh viễn trên đám mây!</span>
+                    <button onClick={() => setIsAuthModalOpen(true)} className="px-2 py-0.5 bg-[#B83227] hover:bg-[#99261c] text-white font-bold text-[10.5px] rounded-lg shrink-0 cursor-pointer">🔑 Đăng Nhập</button>
+                  </div>
+                )}
+
+                {/* VÙNG 2: THÂN THẺ CUỘN Ở GIỮA (FLEX-1 MIN-H-0 OVERFLOW-Y-AUTO) */}
+                {lookbookTab === 'card' ? (
+                  <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 flex flex-col items-center">
+                    {/* THẺ LOOKBOOK POLAROID 9:16 (KÍCH THƯỚC NGUYÊN BẢN ĐẸP TỰ NHIÊN) */}
+                    <div
+                      id="lookbook-story-card"
+                      className="relative w-[340px] sm:w-[360px] h-[600px] sm:h-[640px] shrink-0 mx-auto rounded-3xl overflow-hidden p-3.5 sm:p-4 flex flex-col justify-between shadow-2xl select-none"
+                      style={{
+                        background: 'radial-gradient(circle at 50% 30%, #FFFDF8 0%, #F9F4E8 60%, #F1E9D2 100%)',
+                        fontFamily: '"Be Vietnam Pro", sans-serif'
+                      }}
+                    >
+                      {/* ĐƯỜNG VIỀN HỒI VĂN VÀNG KIM INSET 12PX */}
+                      <div className="absolute inset-3 border border-amber-400/60 rounded-2xl pointer-events-none ring-1 ring-amber-300/30">
+                        <div className="absolute top-1 left-1 text-[8px] text-amber-500/70">❖</div>
+                        <div className="absolute top-1 right-1 text-[8px] text-amber-500/70">❖</div>
+                        <div className="absolute bottom-1 left-1 text-[8px] text-amber-500/70">❖</div>
+                        <div className="absolute bottom-1 right-1 text-[8px] text-amber-500/70">❖</div>
+                      </div>
+
+                      {/* 1. HEADER & TIÊU ĐỀ NGHỆ THUẬT */}
+                      <div className="text-center z-10 pt-1.5 px-3">
+                        <div className="text-[12px] font-bold text-amber-950 tracking-[0.25em] font-serif uppercase">
+                          HỌA SẮC VIỆT
+                        </div>
+                        <div className="text-[8px] tracking-[0.25em] text-amber-800/75 uppercase -mt-0.5 mb-1.5 font-medium">
+                          ─── Dệt Tương Lai Từ Nét Xưa ───
+                        </div>
+
+                        {/* DÒNG 1 (Tiêu đề lớn, viết hoa nghệ thuật): BẮC BỘ KINH KỲ */}
+                        <div className="font-serif font-bold text-[17px] text-slate-900 tracking-wide uppercase leading-tight truncate px-1">
+                          {(() => {
+                            const raw = outfit.title || GARMENTS[outfit.garmentId]?.name || "DỆT SẮC THANH XUÂN";
+                            const m = raw.match(/^(.*?)\s*\(.*?\)$/);
+                            return m ? m[1].trim() : raw;
+                          })()}
+                        </div>
+
+                        {/* DÒNG 2 (Nhãn dòng áo phụ, viết chữ thường thanh lịch): Áo Tứ Thân Dân Gian • Bắc Bộ */}
+                        <div className="text-[11px] text-amber-900/85 font-serif italic mt-0.5 tracking-normal truncate px-1">
+                          {(() => {
+                            const raw = outfit.title || "";
+                            const m = raw.match(/\((.*?)\)/);
+                            if (outfit.garmentId === 'ao_tu_than') return 'Áo Tứ Thân Dân Gian • Bắc Bộ';
+                            if (outfit.garmentId === 'ao_chen') return 'Áo Ngũ Thân Tay Chẽn • Triều Nguyễn';
+                            if (outfit.garmentId === 'ao_tac') return 'Áo Ngũ Thân Tay Thụng (Áo Tấc) • Triều Nguyễn';
+                            if (outfit.garmentId === 'ao_giao_linh') return 'Áo Giao Lĩnh Cung Đình • Đại Việt';
+                            if (m) return m[1].trim();
+                            return (GARMENTS[outfit.garmentId]?.name || 'Cổ Phục Việt') + ' • Di Sản';
+                          })()}
+                        </div>
+
+                        <div className="inline-flex items-center justify-center gap-1.5 mt-0.5">
+                          <span className="text-[10.5px] text-amber-900/85 font-medium leading-none">
+                            Thiết kế: {currentUser?.name || "Nhà Thiết Kế Trẻ"}
+                          </span>
+                          {/* Con Dấu Triện Son Đỏ */}
+                          <div className="w-[18px] h-[18px] bg-rose-700 border border-rose-900 text-amber-100 font-serif text-[6.5px] font-bold flex items-center justify-center rounded-xs shadow-2xs rotate-12 shrink-0 translate-y-[0.5px]">
+                            Họa Sắc
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 2. VISUAL HERO: KHUNG CỬA VÒM TOÀN THÂN */}
+                      <div className="z-10 flex flex-col items-center">
+                        <div className="w-[88%] h-[270px] rounded-t-full rounded-b-xl overflow-hidden border border-amber-300/70 shadow-inner bg-amber-50/30 relative flex items-center justify-center">
+                          {/* Bối cảnh vòm nghệ thuật */}
+                          <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-[#FAF4EA] to-[#EDE2CF] flex items-center justify-center overflow-hidden">
+                            <div className="absolute top-4 w-44 h-44 rounded-full bg-amber-200/40 blur-xl" />
+                            <div className="absolute bottom-0 w-full h-14 bg-[#E3D4BF]/40 border-t border-amber-300/40" />
+                          </div>
+
+                          {/* Nhân vật vector toàn thân */}
+                          <div className="relative z-10 w-full h-full max-w-[210px] flex items-center justify-center drop-shadow-2xl">
+                            <svg viewBox="0 0 300 420" className="w-full h-full drop-shadow-md select-none">
+                              <g transform={`translate(150, 384) scale(${Math.max(0.85, Math.min(1.22, 1 + (outfit.weight - (outfit.gender === 'male' ? 65 : 52)) * 0.0042)).toFixed(3)}, ${Math.max(0.88, Math.min(1.15, 1 + (outfit.height - (outfit.gender === 'male' ? 172 : 162)) * 0.0035)).toFixed(3)}) translate(-150, -384)`}>
+                                {/* Shadow */}
+                                <ellipse cx="150" cy="386" rx={outfit.gender === 'male' ? "76" : "64"} ry="9" fill="#1C1917" opacity="0.25" />
+                                <ellipse cx="150" cy="385" rx={outfit.gender === 'male' ? "56" : "46"} ry="6" fill="#1C1917" opacity="0.38" />
+
+                                {/* Lower garment */}
+                                {outfit.gender === 'male' ? (
+                                  <g>
+                                    <path d="M112 220 L146 220 L142 372 L104 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M154 220 L188 220 L196 372 L158 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    {/* Male shoes */}
+                                    <path d="M106 372 Q118 368 130 372 L128 383 L106 383 Z" fill="#7A1C28" stroke="#4A1018" strokeWidth="0.6" />
+                                    <path d="M170 372 Q182 368 194 372 L194 383 L172 383 Z" fill="#7A1C28" stroke="#4A1018" strokeWidth="0.6" />
+                                    <line x1="110" y1="375" x2="126" y2="375" stroke="#D4AF37" strokeWidth="1" />
+                                    <line x1="174" y1="375" x2="190" y2="375" stroke="#D4AF37" strokeWidth="1" />
+                                  </g>
+                                ) : (
+                                  <g>
+                                    <path d="M126 224 L149 224 L146 372 L124 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M151 224 L174 224 L176 372 L154 372 Z" fill={outfit.bottomColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    {/* Female shoes */}
+                                    <path d="M128 375 Q135 369 146 373 L145 382 Q136 383 129 380 Q127 377 128 375 Z" fill="#881B28" stroke="#4A1018" strokeWidth="0.5" />
+                                    <path d="M154 373 Q165 369 172 375 Q173 377 171 380 Q164 383 155 382 Z" fill="#881B28" stroke="#4A1018" strokeWidth="0.5" />
+                                    <circle cx="135" cy="377" r="1.5" fill="#D4AF37" />
+                                    <circle cx="165" cy="377" r="1.5" fill="#D4AF37" />
+                                  </g>
+                                )}
+
+                                {/* Robe body */}
+                                <path
+                                  d={outfit.gender === 'male'
+                                    ? 'M126 112 L174 112 L182 170 L192 345 L108 345 L118 170 Z'
+                                    : 'M136 118 L164 118 C168 140 166 160 162 180 C172 230 186 290 195 345 L105 345 C114 290 128 230 138 180 C134 160 132 140 136 118 Z'
+                                  }
+                                  fill={outfit.mainColor.hex}
+                                  stroke="#5C5346"
+                                  strokeWidth="0.5"
+                                />
+                                {/* Collar */}
+                                <path
+                                  d={outfit.gender === 'male' ? "M132 104 Q150 108 168 104 L166 118 Q150 122 134 118 Z" : "M135 106 Q150 110 165 106 L163 118 Q150 122 137 118 Z"}
+                                  fill={outfit.mainColor.hex}
+                                  stroke="#5C5346"
+                                  strokeWidth="0.5"
+                                />
+                                {/* Lapel */}
+                                <path
+                                  d={outfit.lapelDirection === 'ta_nham' ? 'M146 114 Q134 135 124 165 L122 250' : 'M154 114 Q166 135 176 165 L178 250'}
+                                  stroke={outfit.lapelDirection === 'ta_nham' ? '#B83227' : '#D4AF37'}
+                                  strokeWidth="2"
+                                  strokeDasharray={outfit.lapelDirection === 'ta_nham' ? '3,2' : 'none'}
+                                  fill="none"
+                                />
+                                {/* Buttons */}
+                                <g fill="#D4AF37" stroke="#2C241D" strokeWidth="0.5">
+                                  <circle cx="150" cy="118" r="2.2" />
+                                  <circle cx={outfit.lapelDirection === 'ta_nham' ? 140 : 160} cy="128" r="2.2" />
+                                  <circle cx={outfit.lapelDirection === 'ta_nham' ? 132 : 168} cy="144" r="2.2" />
+                                  <circle cx={outfit.lapelDirection === 'ta_nham' ? 126 : 174} cy="162" r="2.2" />
+                                  <circle cx={outfit.lapelDirection === 'ta_nham' ? 123 : 177} cy="184" r="2.2" />
+                                </g>
+
+                                {/* Sleeves */}
+                                {outfit.gender === 'male' ? (
+                                  <g>
+                                    <path d="M174 112 L206 150 L202 230 L190 230 L180 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M202 226 C204 228 204 238 201 241 C198 243 194 242 193 237 L193 226 Z" fill="#E8C3AB" />
+                                    <path d="M126 112 L94 150 L110 215 L124 210 L118 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M110 210 C108 212 110 220 114 222 C118 222 120 218 119 212 Z" fill="#E8C3AB" />
+                                  </g>
+                                ) : (
+                                  <g>
+                                    <path d="M136 118 L104 155 L124 218 L138 214 L128 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M164 118 L196 155 L176 218 L162 214 L172 170 Z" fill={outfit.mainColor.hex} stroke="#5C5346" strokeWidth="0.5" />
+                                    <path d="M124 214 C123 216 128 224 133 223 C137 222 138 216 136 212 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                                    <path d="M176 214 C177 216 172 224 167 223 C163 222 162 216 164 212 Z" fill="#FCEFE7" stroke="#DEAE95" strokeWidth="0.4" />
+                                  </g>
+                                )}
+
+                                {/* Neck & Head */}
+                                <path
+                                  d={outfit.gender === 'male' ? "M139 90 L135 118 L165 118 L161 90 Z" : "M142 89 L138 116 L162 116 L158 89 Z"}
+                                  fill={outfit.gender === 'male' ? "#E8C3AB" : "#FCEFE7"}
+                                />
+                                <path
+                                  d={outfit.gender === 'male'
+                                    ? "M132 58 C132 46 139 42 150 42 C161 42 168 46 168 58 C168 76 163 88 150 89 C137 88 132 76 132 58 Z"
+                                    : "M134 60 C134 46 141 42 150 42 C159 42 166 46 166 60 C166 78 159 88 150 88 C141 88 134 78 134 60 Z"
+                                  }
+                                  fill={outfit.gender === 'male' ? "#F4CFBA" : "#FCEFE7"}
+                                  stroke={outfit.gender === 'male' ? "#D9A88F" : "#E6C8B8"}
+                                  strokeWidth="0.6"
+                                />
+                                {/* Face details */}
+                                {outfit.gender === 'male' ? (
+                                  <>
+                                    <path d="M137 63 L146 62.5" stroke="#1F1E22" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                                    <path d="M154 62.5 L163 63" stroke="#1F1E22" strokeWidth="2.2" strokeLinecap="round" fill="none" />
+                                    <ellipse cx="142" cy="69" rx="1.8" ry="1.4" fill="#221F1E" />
+                                    <ellipse cx="158" cy="69" rx="1.8" ry="1.4" fill="#221F1E" />
+                                    <path d="M145 80 Q150 81.5 155 80" stroke="#A8624C" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                                    {/* Khăn đóng nam */}
+                                    <path d="M131 46 C131 38 140 34 150 34 C160 34 169 38 169 46 L168 53 L132 53 Z" fill="#1C1917" stroke="#D4AF37" strokeWidth="0.8" />
+                                    <line x1="132" y1="48" x2="168" y2="48" stroke="#D4AF37" strokeWidth="1.2" />
+                                  </>
+                                ) : (
+                                  <>
+                                    <path d="M140 64 Q144 62 147.5 64" stroke="#262626" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+                                    <path d="M152.5 64 Q156 62 160 64" stroke="#262626" strokeWidth="1.3" strokeLinecap="round" fill="none" />
+                                    <ellipse cx="143.5" cy="68.5" rx="2.5" ry="1.8" fill="#1C1A19" />
+                                    <ellipse cx="156.5" cy="68.5" rx="2.5" ry="1.8" fill="#1C1A19" />
+                                    <path d="M146 80 Q150 81.5 154 80" stroke="#B83227" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+                                    {/* Khăn vấn nữ */}
+                                    <path d="M130 46 C130 36 140 32 150 32 C160 32 170 36 170 46 L168 52 L132 52 Z" fill="#7A1C28" stroke="#D4AF37" strokeWidth="0.8" />
+                                    <path d="M132 44 Q150 38 168 44" stroke="#D4AF37" strokeWidth="1" fill="none" />
+                                  </>
+                                )}
+                              </g>
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="text-[10px] text-amber-950/80 font-serif italic mt-1.5 text-center truncate px-2">
+                          {GARMENTS[outfit.garmentId]?.name} • Phố Cổ Hội An • Nắng Ấm Du Xuân
+                        </div>
+                      </div>
+
+                      {/* 3. DẢI THÔNG TIN VĂN HÓA & NGŨ HÀNH */}
+                      <div className="z-10 grid grid-cols-2 gap-2 px-3 py-1.5 mx-2 rounded-xl bg-white/70 border border-amber-200/60 backdrop-blur-2xs">
+                        <div className="flex flex-col border-r border-amber-200/60 pr-1.5 justify-center">
+                          <span className="font-bold text-emerald-800 flex items-center gap-1 text-[10.5px] leading-tight">
+                            <span>🏵️</span> {authenticity.score}% Chuẩn Di Sản
+                          </span>
+                          <span className="text-[10px] sm:text-[10.5px] text-slate-600 leading-tight mt-0.5 whitespace-normal break-words">
+                            {outfit.lapelDirection === 'ta_nham' ? 'Tang phục Tả Nhậm • Trọng thể.' : 'Quy cách Hữu Nhậm • Chuẩn mực.'}
+                          </span>
+                        </div>
+                        <div className="flex flex-col pl-1.5 justify-center">
+                          <span className="font-bold text-amber-900 flex items-center gap-1 text-[10.5px] leading-tight">
+                            <span>☯️</span> {wuXing.isSinh ? 'Hòa Sắc: Tuyệt Phẩm' : 'Hòa Sắc: Tương Phản'}
+                          </span>
+                          <span className="text-[10px] sm:text-[10.5px] text-slate-600 leading-tight mt-0.5 whitespace-normal break-words">
+                            {wuXing.isSinh
+                              ? `${outfit.innerColor.element} Sinh ${outfit.mainColor.element} • Rạng rỡ trường tồn.`
+                              : `${outfit.mainColor.element} Khắc ${outfit.innerColor.element} • Phá cách hiện đại.`
+                            }
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* 4. DẢI LỤA SẮC TỘC NGŨ HÀNH */}
+                      <div className="z-10 px-3">
+                        <div className="text-[9px] uppercase tracking-wider text-amber-900/80 font-bold text-center mb-1">
+                          Dải Lụa Sắc Tộc Ngũ Hành
+                        </div>
+                        {/* Dải 4 màu xếp liền nhau */}
+                        <div className="grid grid-cols-4 rounded-lg overflow-hidden border border-amber-200 shadow-2xs">
+                          {[
+                            { name: "Xanh Thiên Thanh", role: "Áo Chính", color: outfit.mainColor.hex, elem: outfit.mainColor.element },
+                            { name: "Cam Đất", role: "Vạt Lót", color: outfit.innerColor.hex, elem: outfit.innerColor.element },
+                            { name: outfit.gender === 'female' ? "Quần Nâu Đất" : "Quần Nâu Đất", role: outfit.gender === 'female' ? "Quần Lụa" : "Quần Suông", color: outfit.bottomColor.hex, elem: outfit.bottomColor.element },
+                            { name: "Vàng Hoàng Yến", role: "Phụ Kiện", color: "#D4AF37", elem: "Kim" },
+                          ].map((swatch, idx) => (
+                            <div key={idx} className="flex flex-col">
+                              <div className="h-3.5 w-full shadow-inner" style={{ backgroundColor: swatch.color }} />
+                              <div className="bg-white/90 py-1 text-center flex flex-col items-center justify-center min-h-[36px] px-0.5">
+                                <div className="text-[8.5px] font-bold text-slate-800 leading-tight text-center">
+                                  {swatch.name}
+                                </div>
+                                <div className="text-[7.5px] font-medium text-amber-900/70 leading-tight mt-0.5">
+                                  ({swatch.elem})
+                                </div>
+                                <div className="text-[7px] text-slate-500 leading-tight mt-0.5">
+                                  {swatch.role}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 5. FOOTER & MÃ QR TƯƠNG TÁC */}
+                      <div className="z-10 px-3 pb-1.5 flex items-center justify-between gap-2 border-t border-amber-200/50 pt-1.5">
+                        <div className="flex flex-col text-left">
+                          <span className="text-[8.5px] text-amber-950/80 font-semibold leading-tight">
+                            Quét mã để thử phối lại outfit này
+                          </span>
+                          <span className="text-[8px] text-slate-500 leading-tight mt-0.5">
+                            hoasacviet.heritage.vn
+                          </span>
+                          <div className="flex gap-1 text-[7.5px] text-amber-800/70 mt-0.5 font-medium">
+                            <span>#HoaSacViet</span>
+                            <span>#VietPhucGenZ</span>
+                          </div>
+                        </div>
+
+                        {/* Mã QR viền vàng */}
+                        <div className="w-11 h-11 p-0.5 bg-white border border-amber-300 rounded-md shadow-2xs shrink-0 flex items-center justify-center mb-1">
+                          <img
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://hoasacviet.heritage.vn"
+                            alt="QR Code"
+                            className="w-full h-full object-contain"
+                            crossOrigin="anonymous"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 space-y-4">
+                    {/* Top Hub Bar + Group Album Button */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h4 className="font-serif font-bold text-base text-[#2C241D]">Quản Lý Tủ Đồ Số & Bộ Lọc Đa Chiều</h4>
+                      <button
+                        onClick={() => setIsAlbumCreatorOpen(!isAlbumCreatorOpen)}
+                        className="px-3 py-1.5 bg-[#1B3B6F] text-white text-xs font-bold rounded-xl cursor-pointer"
+                      >
+                        🌐 Tạo Album Chia Sẻ Nhóm
+                      </button>
+                    </div>
+
+                    {isAlbumCreatorOpen && (
+                      <div className="p-3.5 bg-white rounded-2xl border-2 border-[#D4AF37] space-y-2.5 text-xs">
+                        <div className="font-serif font-bold text-sm text-[#2C241D]">Tạo Album Chia Sẻ Nhóm Công Khai</div>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                          <input type="text" value={albumName} onChange={e => setAlbumName(e.target.value)} className="flex-1 px-3 py-1.5 rounded-xl border border-[#D6CEBE]" />
+                          <button onClick={() => setGeneratedAlbumLink('https://hoasacviet.vn/lookbook/nhom-ky-yeu-ueh')} className="px-3.5 py-1.5 bg-[#B83227] text-white font-bold rounded-xl cursor-pointer">Khởi Tạo Album Công Khai</button>
+                        </div>
+                        {generatedAlbumLink && (
+                          <div className="p-3 bg-[#FAF7F2] rounded-xl border border-[#EDE7DC] flex flex-col sm:flex-row items-center justify-between gap-3">
+                            <div className="text-left space-y-1">
+                              <div className="font-mono text-[#1B3B6F] font-bold">{generatedAlbumLink}</div>
+                              <button
+                                onClick={() => {
+                                  navigator.clipboard?.writeText(generatedAlbumLink);
+                                  setAlbumToast('Đã sao chép liên kết Album nhóm! Hãy gửi vào nhóm Zalo/Messenger để bạn bè cùng bình chọn!');
+                                  setTimeout(() => setAlbumToast(null), 3500);
+                                }}
+                                className="px-3 py-1 bg-[#1B3B6F] text-white font-bold rounded-lg cursor-pointer"
+                              >
+                                🔗 Sao Chép Liên Kết Gửi Bạn Bè
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {albumToast && <div className="p-2 bg-emerald-600 text-white rounded-lg font-bold">{albumToast}</div>}
+                      </div>
+                    )}
+
+                    {/* Multi-dimensional Filters */}
+                    <div className="p-3 bg-white rounded-2xl border border-[#EDE7DC] space-y-2.5 text-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {[
+                            { id: 'all', label: 'Tất Cả' },
+                            { id: 'today', label: 'Hôm Nay' },
+                            { id: 'week', label: 'Tuần Này' },
+                            { id: 'month', label: 'Tháng Này' }
+                          ].map(t => (
+                            <button key={t.id} onClick={() => setTimelineFilter(t.id)} className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer ${timelineFilter === t.id ? 'bg-[#B83227] text-white' : 'bg-[#FAF7F2] text-[#5C5346]'}`}>{t.label}</button>
+                          ))}
+                        </div>
+                        <button onClick={() => setOnlyFavorites(!onlyFavorites)} className={`px-2.5 py-1 rounded-lg font-bold border cursor-pointer ${onlyFavorites ? 'bg-amber-100 border-amber-500 text-amber-900' : 'bg-[#FAF7F2] border-[#D6CEBE]'}`}>⭐ Đã Lưu Yêu Thích</button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <select value={garmentFilter} onChange={e => setGarmentFilter(e.target.value)} className="px-2.5 py-1.5 rounded-xl border border-[#D6CEBE] bg-[#FAF7F2]">
+                          <option value="all">Tất cả áo</option>
+                          <option value="ao_tac">Áo Tấc</option>
+                          <option value="ao_chen">Áo Chẽn</option>
+                          <option value="ao_tu_than">Áo Tứ Thân</option>
+                          <option value="ao_giao_linh">Áo Giao Lĩnh</option>
+                        </select>
+                        <select value={occasionFilter} onChange={e => setOccasionFilter(e.target.value)} className="px-2.5 py-1.5 rounded-xl border border-[#D6CEBE] bg-[#FAF7F2]">
+                          <option value="all">Tất cả sự kiện</option>
+                          <option value="tot_nghiep">Kỷ yếu học đường</option>
+                          <option value="dao_pho">Dạo phố check-in</option>
+                          <option value="le_tet">Nghi lễ gia đình</option>
+                          <option value="chup_anh">Lễ hội di sản</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Outfits Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {savedLookbook
+                        .filter(item => !onlyFavorites || item.isFavorite)
+                        .filter(item => garmentFilter === 'all' || item.garmentId === garmentFilter)
+                        .filter(item => occasionFilter === 'all' || item.occasion === occasionFilter)
+                        .map(item => (
+                          <div key={item.id} className="p-3 bg-white rounded-2xl border border-[#D6CEBE] space-y-2.5 text-left">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold uppercase text-[#B83227]">{GARMENTS[item.garmentId]?.name || 'Cổ Phục'}</span>
+                              <button onClick={() => setSavedLookbook(prev => prev.map(x => x.id === item.id ? { ...x, isFavorite: !x.isFavorite } : x))} className="text-sm cursor-pointer">{item.isFavorite ? '⭐' : '☆'}</button>
+                            </div>
+                            <div className="font-serif font-bold text-xs text-[#2C241D]">{item.title}</div>
+                            <div className="text-[10px] text-emerald-700 font-bold">✓ 100% Chuẩn Mực · {item.date}</div>
+                            <div className="flex items-center gap-2 pt-1">
+                              <button
+                                onClick={() => {
+                                  if (item.mainColor) setOutfit(prev => ({ ...prev, garmentId: item.garmentId, mainColor: item.mainColor }));
+                                  setIsLookbookOpen(false);
+                                  setActiveTab('studio');
+                                }}
+                                className="flex-1 py-1.5 bg-[#1B3B6F]/10 hover:bg-[#1B3B6F] hover:text-white text-[#1B3B6F] text-[11px] font-bold rounded-lg cursor-pointer"
+                              >
+                                🔄 Mặc Lại Bản Phối Này
+                              </button>
+                              <button onClick={() => setSavedLookbook(prev => prev.filter(x => x.id !== item.id))} className="px-2 py-1.5 text-red-600 hover:bg-red-50 text-[11px] font-bold rounded-lg cursor-pointer">❌ Xóa</button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* VÙNG 3: FOOTER GHIM DƯỚI (SHRINK-0) */}
+                <div className="shrink-0 flex items-center justify-between px-4 sm:px-6 py-2.5 bg-white border-t border-[#E3DAC9] gap-2 z-10">
+                  <button
+                    onClick={() => {
+                      const newItem = { ...outfit, id: 'saved-' + Date.now(), title: (outfit.title || GARMENTS[outfit.garmentId].name) + ' Phối Đương Đại', occasion: 'dao_pho', isFavorite: false, createdAt: Date.now(), date: 'Hôm nay' };
+                      setSavedLookbook(prev => [newItem, ...prev]);
+                      setLookbookTab('hub');
+                    }}
+                    className="py-1.5 px-3.5 bg-white hover:bg-stone-50 border border-amber-300 text-[#1B3B6F] font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <span>🔖 Lưu Tủ Đồ</span>
+                  </button>
+
+                  <button
+                    id="btn-download-lookbook"
+                    onClick={handleExportPNG}
+                    disabled={isExporting}
+                    className="py-1.5 px-4 bg-[#B83227] hover:bg-[#99261c] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1 disabled:opacity-50"
+                  >
+                    <span>{isExporting ? 'Đang Xuất...' : '📥 Tải Thẻ PNG'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MOCK AUTHENTICATION MODAL */}
+          {isAuthModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+              <div className="relative max-w-[440px] w-full max-h-[90vh] overflow-y-auto bg-[#FFFDF9] rounded-2xl p-6 sm:p-7 border border-amber-200/80 shadow-2xl">
+                {/* Nút đóng dấu (×) cố định góc trên bên phải */}
+                <button
+                  onClick={() => setIsAuthModalOpen(false)}
+                  className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-[#F2EFE9] hover:bg-[#E5E0D8] text-stone-600 hover:text-[#A82824] flex items-center justify-center text-lg font-bold transition-all shadow-2xs cursor-pointer"
+                  title="Đóng cửa sổ"
+                >
+                  ✕
+                </button>
+
+                {/* Tiêu đề & Dòng mô tả ngắn gọn */}
+                <div className="text-center pt-1">
+                  <h2 className="font-display font-bold text-xl text-slate-900 text-center">
+                    Gia Nhập Họa Sắc Việt
+                  </h2>
+                  <p className="text-xs text-amber-900/80 text-center mt-1 mb-4 font-body leading-relaxed">
+                    Đăng nhập để đồng bộ đám mây & lưu không giới hạn tủ đồ Lookbook cá nhân.
+                  </p>
+                </div>
+
+                {/* Thanh tab chuyển đổi (Segmented Control) */}
+                <div className="grid grid-cols-2 p-1 bg-amber-100/60 rounded-xl mb-4 text-xs font-semibold font-body">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthTab('login'); setAuthNotice(null); }}
+                    className={`py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      authTab === 'login'
+                        ? 'bg-white text-slate-900 shadow-xs font-bold'
+                        : 'text-amber-900/70 hover:text-amber-950'
+                    }`}
+                  >
+                    <span>🔑</span> Đăng Nhập
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setAuthTab('register'); setAuthNotice(null); }}
+                    className={`py-1.5 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      authTab === 'register'
+                        ? 'bg-white text-[#A82824] shadow-xs font-bold'
+                        : 'text-amber-900/70 hover:text-[#A82824]'
+                    }`}
+                  >
+                    <span>✨</span> Tạo Tài Khoản
+                  </button>
+                </div>
+
+                {/* Thông báo Thành công / Lỗi (Alert Banner) */}
+                {authNotice && (
+                  <div
+                    className={`p-3 rounded-xl text-xs flex items-start gap-2.5 mb-3.5 border ${
+                      authNotice.type === 'success'
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+                        : 'bg-red-50 border-red-200 text-[#B83227]'
+                    }`}
+                  >
+                    <span className="text-base shrink-0">{authNotice.type === 'success' ? '🎉' : '⚠️'}</span>
+                    <div className="flex-1 text-left leading-relaxed">
+                      <span className="font-medium">{authNotice.message}</span>
+                      {authNotice.type === 'error' && authNotice.message.includes('chưa được đăng ký') && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRegEmail(loginEmail);
+                            setAuthTab('register');
+                            setAuthNotice(null);
+                          }}
+                          className="block mt-1 font-bold text-[#A82824] underline hover:text-red-900 cursor-pointer"
+                        >
+                          👉 Bấm vào đây để tạo tài khoản ngay
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 1-Click Google Auth */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAuthLoading(true);
+                    setAuthNotice(null);
+                    setTimeout(() => {
+                      setIsAuthLoading(false);
+                      setCurrentUser({
+                        name: 'Minh An (UEH)',
+                        email: 'minhan.ueh@gmail.com',
+                        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                        role: 'member'
+                      });
+                      setIsAuthModalOpen(false);
+                    }, 700);
+                  }}
+                  className="w-full py-2.5 px-4 bg-white border-2 border-[#D6CEBE] hover:border-[#A82824] rounded-xl font-bold text-xs text-[#2C241D] cursor-pointer flex items-center justify-center gap-2 mb-3 shadow-xs"
+                >
+                  {isAuthLoading ? '⏳ Đang đồng bộ Google...' : '🔴 Tiếp tục với Google (1-Click Demo Minh An)'}
+                </button>
+
+                <div className="text-[11px] text-[#7A6E5F] italic text-center mb-3">
+                  {authTab === 'login' ? '— hoặc dùng Email sinh viên —' : '— hoặc tạo bằng Email mới —'}
+                </div>
+
+                {authTab === 'login' ? (
+                  <div className="space-y-3 text-left text-xs">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-bold text-[#5C5346]">Email sinh viên / cá nhân</label>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLoginEmail('minhan.ueh@gmail.com');
+                            setLoginPassword('••••••••');
+                            setAuthNotice({ type: 'success', message: 'Đã nạp sẵn tài khoản demo mẫu Minh An (UEH).' });
+                          }}
+                          className="text-[10.5px] text-[#8A5A19] hover:text-[#5C3B0E] underline cursor-pointer"
+                        >
+                          ⚡ Nạp tài khoản demo
+                        </button>
+                      </div>
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={e => { setLoginEmail(e.target.value); if (authNotice) setAuthNotice(null); }}
+                        className="w-full px-3 py-2 rounded-xl border border-[#D6CEBE] bg-white focus:outline-hidden focus:border-[#A82824]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-[#5C5346] block mb-1">Mật khẩu</label>
+                      <input
+                        type="password"
+                        value={loginPassword}
+                        onChange={e => { setLoginPassword(e.target.value); if (authNotice) setAuthNotice(null); }}
+                        className="w-full px-3 py-2 rounded-xl border border-[#D6CEBE] bg-white focus:outline-hidden focus:border-[#A82824]"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const emailInput = loginEmail.trim().toLowerCase();
+                        const isDemo = emailInput === 'minhan.ueh@gmail.com';
+                        const matched = registeredUsers.find(u => u.email.toLowerCase() === emailInput);
+                        if (!matched && !isDemo) {
+                          setAuthNotice({ type: 'error', message: `❌ Tài khoản "${loginEmail}" chưa được đăng ký! Bạn cần tạo tài khoản trước khi đăng nhập.` });
+                          return;
+                        }
+                        if (matched && !isDemo && matched.password !== loginPassword) {
+                          setAuthNotice({ type: 'error', message: '❌ Mật khẩu không chính xác! Vui lòng kiểm tra lại.' });
+                          return;
+                        }
+                        const user = matched || { name: 'Minh An (UEH)', email: 'minhan.ueh@gmail.com' };
+                        setCurrentUser({
+                          name: user.name,
+                          email: user.email,
+                          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+                          role: 'member'
+                        });
+                        setIsAuthModalOpen(false);
+                      }}
+                      className="w-full py-2.5 bg-[#A82824] hover:bg-[#8d1d0b] text-white font-bold rounded-xl cursor-pointer text-center shadow-md transition-all active:scale-98"
+                    >
+                      Đăng Nhập
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-left text-xs">
+                    <div>
+                      <label className="text-[11px] font-bold text-[#5C5346] block mb-1">Họ và Tên</label>
+                      <input
+                        type="text"
+                        placeholder="Ví dụ: Nguyễn Minh An"
+                        value={regName}
+                        onChange={e => { setRegName(e.target.value); if (authNotice) setAuthNotice(null); }}
+                        className="w-full px-3 py-2 rounded-xl border border-[#D6CEBE] bg-white focus:outline-hidden focus:border-[#A82824]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-[#5C5346] block mb-1">Email sinh viên / cá nhân</label>
+                      <input
+                        type="email"
+                        placeholder="name@domain.com"
+                        value={regEmail}
+                        onChange={e => { setRegEmail(e.target.value); if (authNotice) setAuthNotice(null); }}
+                        className="w-full px-3 py-2 rounded-xl border border-[#D6CEBE] bg-white focus:outline-hidden focus:border-[#A82824]"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-[#5C5346] block mb-1">Mật khẩu khởi tạo</label>
+                      <input
+                        type="password"
+                        placeholder="Tối thiểu 6 ký tự"
+                        value={regPassword}
+                        onChange={e => { setRegPassword(e.target.value); if (authNotice) setAuthNotice(null); }}
+                        className="w-full px-3 py-2 rounded-xl border border-[#D6CEBE] bg-white focus:outline-hidden focus:border-[#A82824]"
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const nameTrim = regName.trim();
+                        const emailTrim = regEmail.trim().toLowerCase();
+                        const pwdTrim = regPassword.trim();
+                        if (!nameTrim) { setAuthNotice({ type: 'error', message: 'Vui lòng nhập Họ và Tên!' }); return; }
+                        if (!emailTrim || !emailTrim.includes('@')) { setAuthNotice({ type: 'error', message: 'Vui lòng nhập email hợp lệ!' }); return; }
+                        if (pwdTrim.length < 6) { setAuthNotice({ type: 'error', message: 'Mật khẩu cần tối thiểu 6 ký tự!' }); return; }
+                        if (registeredUsers.some(u => u.email.toLowerCase() === emailTrim)) {
+                          setAuthNotice({ type: 'error', message: `Email "${emailTrim}" đã được đăng ký trước đó. Vui lòng chuyển sang tab Đăng Nhập!` });
+                          return;
+                        }
+                        const newAcc = { name: nameTrim, email: emailTrim, password: pwdTrim };
+                        setRegisteredUsers([...registeredUsers, newAcc]);
+                        setAuthTab('login');
+                        setLoginEmail(emailTrim);
+                        setLoginPassword(pwdTrim);
+                        setRegName('');
+                        setRegEmail('');
+                        setRegPassword('');
+                        setAuthNotice({ type: 'success', message: `🎉 Tạo tài khoản "${nameTrim}" thành công! Vui lòng bấm Đăng Nhập để bắt đầu.` });
+                      }}
+                      className="w-full py-2.5 bg-[#A82824] hover:bg-[#8d1d0b] text-white font-bold rounded-xl cursor-pointer text-center shadow-md transition-all active:scale-98"
+                    >
+                      ✨ Đăng Ký Tài Khoản
+                    </button>
+                  </div>
+                )}
+
+                <div className="text-center pt-3 text-[10.5px] text-[#7A6E5F] border-t border-[#D6CEBE]/50 mt-3">
+                  {authTab === 'login' ? '🛡️ Bản demo tự động nạp sẵn tài khoản mẫu Minh An (UEH)' : '🛡️ Sau khi đăng ký, bạn sẽ chuyển sang bước đăng nhập để truy cập'}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* QUICK GUIDE 30S MODAL */}
+          {isQuickGuideOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-md">
+              <div className="bg-gradient-to-b from-[#FFFDF9] via-[#FAF7F2] to-[#F4EFE6] rounded-3xl p-6 sm:p-8 max-w-4xl w-full border-2 border-[#D4AF37] shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="space-y-1 text-left">
+                    <span className="text-[10.5px] font-bold uppercase tracking-wider text-[#8A5A19] bg-amber-100 px-3 py-1 rounded-full border border-[#D4AF37]/50">💡 Cẩm Nang Nhập Môn 30 Giây</span>
+                    <h2 className="text-2xl sm:text-3xl font-serif font-black text-[#2C241D] pt-1">3 Bước Chạm Di Sản – Tự Tay Phối Cổ Phục</h2>
+                    <p className="text-xs sm:text-sm text-[#5C5346]">Khám phá cách trở thành Stylist cổ phục hiện đại cùng Họa Sắc Việt chỉ trong 30 giây.</p>
+                  </div>
+                  <button onClick={() => setIsQuickGuideOpen(false)} className="text-xs font-bold text-[#7A6E5F] p-1.5 cursor-pointer">✕</button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                  <div className="p-5 bg-white rounded-2xl border-2 border-[#E3DAC9] space-y-2.5">
+                    <div className="text-2xl">👘</div>
+                    <h3 className="text-base font-serif font-bold text-[#2C241D]">Bước 1: Chọn Dáng Áo & Bối Cảnh</h3>
+                    <p className="text-xs text-[#5C5346] leading-relaxed"><strong>Bí quyết:</strong> Chọn dịp xuất hiện (Kỷ yếu tốt nghiệp, Dạo phố cafe, Trẩy hội Tết) và dáng áo yêu thích (Áo tấc, Áo chẽn, Áo dài, Giao lĩnh).</p>
+                  </div>
+
+                  <div className="p-5 bg-white rounded-2xl border-2 border-[#E3DAC9] space-y-2.5">
+                    <div className="text-2xl">👟</div>
+                    <h3 className="text-base font-serif font-bold text-[#2C241D]">Bước 2: Tự Do Remix Phụ Kiện & Hòa Sắc</h3>
+                    <p className="text-xs text-[#5C5346] leading-relaxed"><strong>Bí quyết:</strong> Kết hợp cùng Sneaker retro, Áo khoác blazer hoặc bấm nút <strong>✨ AI Auto-Match</strong> để Gemini tự động cân bằng Ngũ Hành (Mộc sinh Hỏa, Kim sinh Thủy).</p>
+                  </div>
+
+                  <div className="p-5 bg-white rounded-2xl border-2 border-[#E3DAC9] space-y-2.5">
+                    <div className="text-2xl">📜</div>
+                    <h3 className="text-base font-serif font-bold text-[#2C241D]">Bước 3: Tra Cứu Ý Nghĩa & Xuất Lookbook</h3>
+                    <p className="text-xs text-[#5C5346] leading-relaxed"><strong>Bí quyết:</strong> Rê chuột vào cúc áo để học đạo lý Ngũ thường, chú ý thanh Cảnh Báo Di Sản (tránh lỗi cấm kỵ), và bấm <strong>Xuất Lookbook</strong> tải ảnh thẻ Polaroid 9:16 về máy!</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#E3DAC9]">
+                  <button
+                    onClick={() => {
+                      setIsQuickGuideOpen(false);
+                      setActiveTab('studio');
+                      setTourStep(1);
+                    }}
+                    className="w-full sm:w-auto px-4 py-2.5 text-xs font-bold text-[#1B3B6F] bg-white border border-[#D6CEBE] rounded-2xl cursor-pointer"
+                  >
+                    🧭 Xem Tour Giới Thiệu Từng Bước
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsQuickGuideOpen(false);
+                      setActiveTab('studio');
+                    }}
+                    className="w-full sm:w-auto px-7 py-3 text-xs sm:text-sm font-bold text-white bg-[#B83227] hover:bg-[#99261c] rounded-2xl shadow-lg cursor-pointer"
+                  >
+                    🚀 Bắt Đầu Phối Đồ Ngay
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* INTERACTIVE 4-STEP GUIDED TOUR SPOTLIGHT */}
+          {activeTab === 'studio' && tourStep && (
+            <>
+              <div onClick={() => setTourStep(null)} className="fixed inset-0 bg-black/60 z-40 transition-all duration-300" />
+              <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[94%] max-w-xl bg-gradient-to-b from-[#FFFDF9] via-[#FAF7F2] to-[#F3EDE0] rounded-3xl border-2 border-[#D4AF37] shadow-2xl p-5 space-y-3 text-left">
+                <div className="flex items-center justify-between pb-2 border-b border-[#E3DAC9]">
+                  <span className="px-2.5 py-0.5 rounded-full bg-[#B83227] text-white text-[11px] font-bold">Bước {tourStep} / 4</span>
+                  <button onClick={() => setTourStep(null)} className="text-[11px] font-bold text-[#7A6E5F] hover:text-[#B83227] cursor-pointer">✖ Bỏ qua tour</button>
+                </div>
+                <div className="font-serif font-bold text-sm sm:text-base text-[#2C241D]">
+                  {tourStep === 1 && '1. Bắt đầu tại đây: Chọn sự kiện, thời tiết hoặc gõ câu lệnh tự nhiên cho Gemini Stylist.'}
+                  {tourStep === 2 && '2. Tự do sáng tạo: Chọn loại cổ phục, màu sắc ngũ hành và các phụ kiện Gen Z thời thượng.'}
+                  {tourStep === 3 && '3. Xem thay đổi trực tiếp: Ngắm trang phục thay đổi theo thời gian thực và theo dõi Thước đo Chuẩn mực Di sản.'}
+                  {tourStep === 4 && '4. Lan tỏa thành phẩm: Bấm Xuất Lookbook để tạo ảnh thẻ 9:16 chia sẻ lên Story mạng xã hội!'}
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#E3DAC9]">
+                  {tourStep > 1 && (
+                    <button onClick={() => setTourStep(tourStep - 1)} className="px-3.5 py-1.5 text-xs font-bold bg-white border border-[#D6CEBE] rounded-xl cursor-pointer">⬅ Quay Lại</button>
+                  )}
+                  <button
+                    onClick={() => setTourStep(tourStep < 4 ? tourStep + 1 : null)}
+                    className="px-4 py-1.5 text-xs font-bold text-white bg-[#B83227] rounded-xl cursor-pointer"
+                  >
+                    {tourStep < 4 ? 'Tiếp Tục ➔' : 'Hoàn Tất'}
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>

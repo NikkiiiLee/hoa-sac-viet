@@ -1,0 +1,8 @@
+{
+  "name": "DEMO 2 - Họa Sắc Việt",
+  "description": "Studio phối đồ và khám phá Cổ phục Việt Nam đương đại dành cho thế hệ trẻ: remix trang phục, bảo tồn bản sắc và nhận diện cảnh báo di sản.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

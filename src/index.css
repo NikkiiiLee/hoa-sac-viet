@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Playfair Display', 'Lora', Georgia, serif;
+  --font-heritage: 'Lora', 'Playfair Display', Georgia, serif;
+  --font-cinzel: 'Playfair Display', 'Lora', Georgia, serif;
+}
+
+@layer base {
+  * {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    word-spacing: normal !important;
+    letter-spacing: normal !important;
+  }
+
+  body {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #FAF7F2;
+    color: #2C241D;
+    line-height: 1.5;
+  }
+
+  button, input, select, textarea {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', Georgia, serif;
+    line-height: 1.35;
+  }
+}
+
+.font-display {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  line-height: 1.35 !important;
+}
+
+/* Explicit Utility Classes to override any system fallbacks */
+.font-serif {
+  font-family: 'Playfair Display', 'Lora', Georgia, serif !important;
+}
+
+.font-sans {
+  font-family: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.font-heritage {
+  font-family: 'Lora', 'Playfair Display', Georgia, serif !important;
+}
+
+.font-cinzel {
+  font-family: 'Playfair Display', 'Lora', Georgia, serif !important;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', 'Lora', Georgia, serif !important;
+}
+
+/* Subtle Giấy Dó (Vietnamese Handmade Mulberry Paper) Grain */
+.bg-giay-do {
+  background-color: #FAF7F2;
+  background-image: radial-gradient(#d6cebe 0.75px, transparent 0.75px), radial-gradient(#d6cebe 0.75px, #FAF7F2 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+/* Custom smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FAF7F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D6CEBE;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B83227;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.glow-tuong-sinh {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.45);
+}
+
+.glow-tuong-khac {
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.45);
+}
+
+@keyframes pulse-alert {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(184, 50, 39, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px 4px rgba(184, 50, 39, 0.35);
+  }
+}
+
+.animate-pulse-alert {
+  animation: pulse-alert 2s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   Cột Visualizer Cố Định (Sticky) & Hiển Thị Đầy Đủ Không Bị Cắt Bớt (.lg:col-span-5)
+   ========================================================================== */
+.lg\:col-span-5.sticky {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 3.75rem !important;
+  max-height: calc(100dvh - 4.25rem) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch !important;
+  align-self: flex-start !important;
+}
+
+@media (min-width: 640px) {
+  .lg\:col-span-5.sticky {
+    top: 4.25rem !important;
+    max-height: calc(100dvh - 4.75rem) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .lg\:col-span-5.sticky {
+    top: 4.75rem !important;
+    max-height: calc(100dvh - 5.25rem) !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:col-span-5.sticky {
+    top: 5rem !important;
+    max-height: calc(100dvh - 5.5rem) !important;
+  }
+}
