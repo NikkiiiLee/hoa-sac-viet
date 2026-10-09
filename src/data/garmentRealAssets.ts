@@ -137,7 +137,7 @@ export const REAL_GARMENT_REGISTRY: Record<GarmentId, GarmentRealDetail> = {
     eraName: 'Triều Nguyễn (Thế kỷ 19 - 20)',
     tagline: 'Thường phục thanh lịch, đoan trang và năng động của người Việt xưa',
     photoIndexLabel: 'Áo Ngũ Thân Tay Chẽn Cổ Phong',
-    photoUrl: ao-chen-that.png,
+    photoUrl: aoChenRealImg,
     photoCaption: 'Mẫu thực tế: Cặp đôi mặc Áo Ngũ Thân Tay Chẽn (V\'Style - Đại Việt Cổ Phong). Chàng diện áo ngũ thân xanh lam đậm che dù giấy dầu, Nàng diện áo ngũ thân hồng phấn xách giỏ mây tre truyền thống.',
     modelInfo: 'Concept: Phố Thị Trí Thức • Chàng: Áo chẽn xanh lam • Nàng: Áo chẽn hồng phấn • May đo theo lối cổ Triều Nguyễn',
     heritageRating: '100% Chuẩn Di Sản Triều Nguyễn (Ngũ Thân Tay Chẽn)',
