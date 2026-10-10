@@ -6,10 +6,10 @@ import duXuanImg from '../assets/images/concept_du_xuan_1790948981273.jpg';
 import heroImg from '../assets/images/hero_hoasacviet_remix_1790948938640.jpg';
 
 import aoChenRealImg from '../assets/images/ao-chen-that.png';
-import aoTacRealImg from '../assets/images/ao-tac-that.jpg';
-import aoGiaoLinhRealImg from '../assets/images/ao-giao-linh-that.jpg';
-import aoDaiTruyenThongRealImg from '../assets/images/ao-dai-truyen-thong-that.jpg';
-import aoDaiCachTanRealImg from '../assets/images/ao-cach-tan-that.jpg';
+import aoTacRealImg from '../assets/images/ao-tac-that.png';
+import aoGiaoLinhRealImg from '../assets/images/ao-giao-linh-that.png';
+import aoDaiTruyenThongRealImg from '../assets/images/ao-dai-truyen-thong-that.png';
+import aoDaiCachTanRealImg from '../assets/images/ao-cach-tan-that.png';
 
 export interface TuThanPart {
   number: number;
