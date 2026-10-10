@@ -6,6 +6,10 @@ import duXuanImg from '../assets/images/concept_du_xuan_1790948981273.jpg';
 import heroImg from '../assets/images/hero_hoasacviet_remix_1790948938640.jpg';
 
 import aoChenRealImg from '../assets/images/ao-chen-that.png';
+import aoTacRealImg from '../assets/images/ao-tac-that.jpg';
+import aoGiaoLinhRealImg from '../assets/images/ao-giao-linh-that.jpg';
+import aoDaiTruyenThongRealImg from '../assets/images/ao-dai-truyen-thong-that.jpg';
+import aoDaiCachTanRealImg from '../assets/images/ao-cach-tan-that.jpg';
 
 export interface TuThanPart {
   number: number;
@@ -201,7 +205,7 @@ export const REAL_GARMENT_REGISTRY: Record<GarmentId, GarmentRealDetail> = {
     eraName: 'Lễ Phục Quốc Gia Triều Nguyễn',
     tagline: 'Đại lễ phục trang trọng, bệ vệ với tay thụng buông dài quá ngón',
     photoIndexLabel: 'Áo Tấc Hoàng Gia Tại Ngọ Môn Huế',
-    photoUrl: kyYeuImg,
+    photoUrl: aoTacRealImg,
     photoCaption: 'Mẫu thực tế: Cặp đôi mặc Áo Tấc hoàng gia trước cổng Ngọ Môn (Đại Nội Huế). Cô dâu diện Áo Tấc đỏ chu sa hoa văn Nhật Bình cung đình kèm khăn vấn xanh lam ngũ sắc, Chú rể mặc Áo Tấc trắng ngà thêu rồng triều Nguyễn.',
     modelInfo: 'Concept: Kỷ Yếu Hoàng Gia • Bối cảnh: Ngọ Môn Huế • Lễ phục cưới cung đình triều Nguyễn • Tay thụng 40cm',
     heritageRating: '100% Chuẩn Đại Lễ Phục Cung Đình Triều Nguyễn',
@@ -328,7 +332,7 @@ export const REAL_GARMENT_REGISTRY: Record<GarmentId, GarmentRealDetail> = {
     eraName: 'Đại Việt Thời Lý - Trần - Hậu Lê',
     tagline: 'Khí chất hào sảng, cổ điển và phong lưu của quý tộc Đại Việt',
     photoIndexLabel: 'Áo Giao Lĩnh Cổ Chéo Đại Việt',
-    photoUrl: heroImg,
+    photoUrl: aoGiaoLinhRealImg,
     photoCaption: 'Mẫu thực tế: Chàng mặc Áo Giao Lĩnh cổ chéo chữ V màu vàng kim champagne cầm quạt xếp, Nàng mặc Áo Giao Lĩnh màu tím tía gấm hoa chìm đeo chuỗi ngọc trai bên hồ sen Đại Việt.',
     modelInfo: 'Concept: Phong Hoa Đại Việt • Chàng: Giao lĩnh vàng champagne • Nàng: Giao lĩnh tím tía • Vạt chéo chữ V thời Lê',
     heritageRating: '100% Chuẩn Khí Tiết Cổ Trang Đại Việt',
@@ -384,7 +388,7 @@ export const REAL_GARMENT_REGISTRY: Record<GarmentId, GarmentRealDetail> = {
     eraName: 'Đô Thị Tân Thời (1950s - Nay)',
     tagline: 'Quốc phục tôn vinh đường cong thanh lịch và vẻ đẹp kín đáo của phụ nữ Việt',
     photoIndexLabel: 'Áo Dài Truyền Thống Phố Cổ',
-    photoUrl: heroImg,
+    photoUrl: aoDaiTruyenThongRealImg,
     photoCaption: 'Mẫu thực tế: Cặp đôi mặc Áo Dài truyền thống màu trắng tinh khôi gấm hoa sen chìm trên phố cổ Hà Nội / Hội An. Nàng thướt tha đoan trang, Chàng lịch lãm thêu họa tiết chiếc quạt trước ngực.',
     modelInfo: 'Concept: Phố Cổ Tinh Khôi • Cặp đôi: Áo Dài trắng gấm hoa sen • Bối cảnh: Phố cổ tường vàng cờ đỏ',
     heritageRating: '100% Biểu Tượng Quốc Phục Việt Nam',
@@ -447,7 +451,7 @@ export const REAL_GARMENT_REGISTRY: Record<GarmentId, GarmentRealDetail> = {
     eraName: 'Đương Đại Gen Z & Thời Trang Ứng Dụng',
     tagline: 'Năng động, trẻ trung, kết nối di sản ngàn năm với nhịp sống đô thị',
     photoIndexLabel: 'Áo Dài Cách Tân Hiện Đại Song Phụng',
-    photoUrl: phoThiImg,
+    photoUrl: aoDaiCachTanRealImg,
     photoCaption: 'Mẫu thực tế: Áo đôi Song Phụng màu vàng cam đất nổi bật với họa tiết chim công / khổng tước thêu mosaic xanh sapphire trước ngực, tay lỡ 3/4, tà lửng qua gối phối sneaker trắng năng động.',
     modelInfo: 'Concept: Song Phụng Đương Đại • Bộ sưu tập: Áo Đôi Song Phụng • Tay lỡ 3/4 • Quần trắng x Giày sneaker',
     heritageRating: '95% Di Sản Thích Nghi Hiện Đại (Văn Minh & Lịch Sự)',
